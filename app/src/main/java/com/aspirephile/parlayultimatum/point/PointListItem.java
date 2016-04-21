@@ -29,7 +29,7 @@ public class PointListItem {
             PID = String.valueOf(rs.getInt("PID"));
             poster = rs.getString("poster");
             title = rs.getString("title");
-            views = rs.getString("views") + " "
+            views = "" + rs.getString("views") + " "
                     + context.getString(R.string.views);
             upVotesPercentage = rs.getShort("upVotesPercentage");
             tag1 = rs.getString("tag1");
