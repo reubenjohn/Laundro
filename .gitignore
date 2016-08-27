@@ -1,9 +1,3 @@
-#Iml files
-*.iml
-
-#Captures
-/captures
-
 # built application files
 *.apk
 *.ap_
@@ -50,16 +44,13 @@ Thumbs.db
 .idea/tasks.xml
 .idea/dictionaries
 
-.idea/codeStyleSettings.xml
-.idea/inspectionProfiles/Project_Default.xml
-.idea/inspectionProfiles/profiles_settings.xml
-
 # Sensitive or high-churn files:
 .idea/dataSources.ids
 .idea/dataSources.xml
 .idea/sqlDataSources.xml
 .idea/dynamic.xml
 .idea/uiDesigner.xml
+*.iml
 
 # Gradle:
 .idea/gradle.xml
@@ -77,8 +68,6 @@ Thumbs.db
 
 # Log Files
 *.log
-
-local.properties
 
 #Keystores
 *.keystore

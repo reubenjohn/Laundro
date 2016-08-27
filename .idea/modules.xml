@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ParlayUltimatum.iml" filepath="$PROJECT_DIR$/ParlayUltimatum.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Laundro.iml" filepath="$PROJECT_DIR$/Laundro.iml" />
       <module fileurl="file://$PROJECT_DIR$/aceqlandroid/aceqlandroid.iml" filepath="$PROJECT_DIR$/aceqlandroid/aceqlandroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/shared/shared.iml" filepath="$PROJECT_DIR$/shared/shared.iml" />

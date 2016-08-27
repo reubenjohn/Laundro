@@ -16,5 +16,4 @@
         tools:context=".pointCreatorItem.PointListFragment"
         tools:listitem="@layout/list_item_point" />
 
-
 </android.support.v4.widget.SwipeRefreshLayout>

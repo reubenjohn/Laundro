@@ -156,7 +156,7 @@ public class PointListFragment extends Fragment implements SwipeRefreshLayout.On
                         preparedStatement.setString(1, PID);
 //                        preparedStatement.setString(2, String.valueOf(standing));
                     } else {
-                        sql = "SELECT * FROM Topic";
+                        sql = "SELECT * FROM Question";
                         preparedStatement = remoteConnection.prepareStatement(sql);
                     }
                     return preparedStatement;

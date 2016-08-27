@@ -1,18 +1,28 @@
 
 package com.aspirephile.parlayultimatum.comment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 
 import com.aspirephile.parlayultimatum.Constants;
 import com.aspirephile.parlayultimatum.R;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
+import org.kawanfw.sql.api.client.android.AceQLDBManager;
+import org.kawanfw.sql.api.client.android.BackendConnection;
+import org.kawanfw.sql.api.client.android.execute.OnGetPrepareStatement;
+import org.kawanfw.sql.api.client.android.execute.update.OnUpdateCompleteListener;
+
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class CommentListActivity extends AppCompatActivity implements CommentListFragment.OnListFragmentInteractionListener {
@@ -20,6 +30,8 @@ public class CommentListActivity extends AppCompatActivity implements CommentLis
 
     private String PID;
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
+    private CommentListFragment commentListF;
+    private EditText description;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +54,40 @@ public class CommentListActivity extends AppCompatActivity implements CommentLis
 
         setContentView(R.layout.activity_comment_list);
 
+        description = (EditText) findViewById(R.id.et_comment_description);
+        findViewById(R.id.fab_comment_list).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AceQLDBManager.executeUpdate(new OnGetPrepareStatement() {
+                    @Override
+                    public PreparedStatement onGetPreparedStatement(BackendConnection remoteConnection) {
+                        String sql = "insert into ParlayComment (PID,username,description) values (?,?,?)";
+                        PreparedStatement preparedStatement = null;
+                        try {
+                            preparedStatement = remoteConnection.prepareStatement(sql);
+                            preparedStatement.setString(1, PID);
+                            String username = getSharedPreferences(Constants.files.authentication, Context.MODE_PRIVATE)
+                                    .getString(Constants.preferences.username, null);
+                            preparedStatement.setString(2, username);
+                            preparedStatement.setString(3, description.getText().toString());
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                        return preparedStatement;
+                    }
+                }, new OnUpdateCompleteListener() {
+                    @Override
+                    public void onUpdateComplete(int result, SQLException e) {
+                        if (e != null) {
+                            e.printStackTrace();
+                        } else {
+                            l.i("Comments affected: " + result);
+                            commentListF.onRefresh();
+                        }
+                    }
+                });
+            }
+        });
         openCommentListFragment();
     }
 
@@ -49,7 +95,7 @@ public class CommentListActivity extends AppCompatActivity implements CommentLis
     private void openCommentListFragment() {
         // find the retained fragment on activity restarts
         FragmentManager fm = getSupportFragmentManager();
-        CommentListFragment commentListF = (CommentListFragment) fm.findFragmentByTag(Constants.tags.commentListFragment);
+        commentListF = (CommentListFragment) fm.findFragmentByTag(Constants.tags.commentListFragment);
 
         if (!asserter.assertPointerQuietly(commentListF)) {
             l.i("Creating new " + CommentListFragment.class.getSimpleName() + " fragment");
