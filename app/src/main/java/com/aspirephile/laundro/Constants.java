@@ -21,7 +21,7 @@ public class Constants {
 
     public static class extras {
 
-        public static final String PID = "PID";
+        public static final String _id = "_id";
         public static final String errorResult = "errorResult";
         public static final String CID = "CID";
     }

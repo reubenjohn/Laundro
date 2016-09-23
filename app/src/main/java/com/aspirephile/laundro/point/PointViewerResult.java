@@ -26,7 +26,7 @@ public class PointViewerResult {
         if (context == null)
             throw new IllegalArgumentException("Cannot provide a null context!");
 
-        PID = String.valueOf(rs.getInt("PID"));
+        PID = String.valueOf(rs.getInt("_id"));
         poster = rs.getString("poster");
         title = rs.getString("title");
         description = rs.getString("description");

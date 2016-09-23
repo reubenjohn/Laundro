@@ -8,8 +8,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.aspirephile.laundro.R;
-import com.aspirephile.laundro.point.PointListFragment.OnListFragmentInteractionListener;
+import com.aspirephile.laundro.db.tables.Service;
+import com.aspirephile.laundro.point.ServiceListFragment.OnListFragmentInteractionListener;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,12 +20,12 @@ import java.util.List;
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class PointRecyclerViewAdapter extends RecyclerView.Adapter<PointRecyclerViewAdapter.ViewHolder> {
+public class ServiceRecyclerViewAdapter extends RecyclerView.Adapter<ServiceRecyclerViewAdapter.ViewHolder> {
 
-    private final List<PointListItem.PointItem> mValues;
+    private final List<Service> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public PointRecyclerViewAdapter(List<PointListItem.PointItem> items, OnListFragmentInteractionListener listener) {
+    public ServiceRecyclerViewAdapter(List<Service> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -30,20 +33,18 @@ public class PointRecyclerViewAdapter extends RecyclerView.Adapter<PointRecycler
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item_point, parent, false);
+                .inflate(R.layout.list_item_service, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.titleView.setText(mValues.get(position).title);
-        holder.viewCountView.setText(mValues.get(position).views);
-        holder.votesView.setProgress(mValues.get(position).upVotesPercentage);
-        holder.tag1View.setText(mValues.get(position).tag1);
-        holder.tag2View.setText(mValues.get(position).tag2);
-        holder.tag3View.setText(mValues.get(position).tag3);
-        holder.tag4View.setText(mValues.get(position).tag4);
+        holder.nameView.setText(holder.mItem.name);
+        Date createdAt = new Date(holder.mItem.createdAt);
+        holder.createdAtView.setText(DateFormat.getDateInstance().format(createdAt));
+        holder.locationView.setText(holder.mItem.location);
+        //holder.ratingView.setProgress(mValues.get(position).rating);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,22 +65,20 @@ public class PointRecyclerViewAdapter extends RecyclerView.Adapter<PointRecycler
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView titleView;
-        public final TextView viewCountView;
-        public final ProgressBar votesView;
-        public final TextView tag1View, tag2View, tag3View, tag4View;
-        public PointListItem.PointItem mItem;
+        public final TextView createdAtView;
+        public final TextView nameView;
+        public final TextView locationView;
+        public final ProgressBar ratingView;
+        //public final TextView tag1View, tag2View, tag3View, tag4View;
+        public Service mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            titleView = (TextView) view.findViewById(R.id.tv_item_point_title);
-            viewCountView = (TextView) view.findViewById(R.id.tv_item_point_views);
-            votesView = (ProgressBar) view.findViewById(R.id.pm_item_point_votes);
-            tag1View = (TextView) view.findViewById(R.id.tv_item_point_tag_1);
-            tag2View = (TextView) view.findViewById(R.id.tv_item_point_tag_2);
-            tag3View = (TextView) view.findViewById(R.id.tv_item_point_tag_3);
-            tag4View = (TextView) view.findViewById(R.id.tv_item_point_tag_4);
+            createdAtView = (TextView) view.findViewById(R.id.tv_item_service_created_at);
+            nameView = (TextView) view.findViewById(R.id.tv_item_service_name);
+            locationView = (TextView) view.findViewById(R.id.tv_item_service_location);
+            ratingView = (ProgressBar) view.findViewById(R.id.pm_item_service_rating);
         }
 
     }

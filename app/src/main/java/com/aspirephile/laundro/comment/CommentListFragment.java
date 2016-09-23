@@ -35,7 +35,7 @@ import java.util.ArrayList;
 public class CommentListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private static final String ARG_PID = "PID";
+    private static final String ARG_PID = "_id";
     private Logger l = new Logger(CommentListFragment.class);
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
 
@@ -118,7 +118,7 @@ public class CommentListFragment extends Fragment implements SwipeRefreshLayout.
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setRefreshing(true);
         }
-        final String sql = "select username as poster, PID, CID, timestamp, description from ParlayComment where PID=? order by CID desc";
+        final String sql = "select username as poster, _id, CID, timestamp, description from ParlayComment where _id=? order by CID desc";
 
         OnGetPrepareStatement getPreparedStatementListener = new OnGetPrepareStatement() {
             @Override

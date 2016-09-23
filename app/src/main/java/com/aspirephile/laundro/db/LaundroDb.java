@@ -1,5 +1,6 @@
 package com.aspirephile.laundro.db;
 
+import android.app.Service;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -17,19 +18,22 @@ public class LaundroDb extends SQLiteOpenHelper {
     private static LaundroDb dbHelper = null;
 
     private static UserManager userManager;
+    private static ServiceManager serviceManager;
 
     public LaundroDb(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(User.SQL_CREATE_ENTRIES);
+        getUserManager().onCreate(db);
+        getServiceManager().onCreate(db);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
-        db.execSQL(User.SQL_DELETE_ENTRIES);
+        getUserManager().onDestroy(db);
+        getServiceManager().onDestroy(db);
         onCreate(db);
     }
 
@@ -47,5 +51,13 @@ public class LaundroDb extends SQLiteOpenHelper {
             return userManager;
         else
             return (userManager = new UserManager(dbHelper));
+    }
+
+    @NonNull
+    public static ServiceManager getServiceManager() {
+        if (serviceManager != null)
+            return serviceManager;
+        else
+            return (serviceManager = new ServiceManager(dbHelper));
     }
 }

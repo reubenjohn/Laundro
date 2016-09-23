@@ -43,10 +43,10 @@ public class CommentListActivity extends AppCompatActivity implements CommentLis
             data.putExtra(Constants.extras.errorResult, Constants.errorResults.badIntent);
             setResult(RESULT_CANCELED, data);
             return;
-        } else if ((PID = i.getStringExtra(Constants.extras.PID)) == null) {
+        } else if ((PID = i.getStringExtra(Constants.extras._id)) == null) {
             Intent data = new Intent();
             data.putExtra(Constants.extras.errorResult, Constants.errorResults.badPID);
-            data.putExtra(Constants.extras.PID, PID);
+            data.putExtra(Constants.extras._id, PID);
             setResult(RESULT_CANCELED, data);
             return;
         }
@@ -60,7 +60,7 @@ public class CommentListActivity extends AppCompatActivity implements CommentLis
                 AceQLDBManager.executeUpdate(new OnGetPrepareStatement() {
                     @Override
                     public PreparedStatement onGetPreparedStatement(BackendConnection remoteConnection) {
-                        String sql = "insert into ParlayComment (PID,username,description) values (?,?,?)";
+                        String sql = "insert into ParlayComment (_id,username,description) values (?,?,?)";
                         PreparedStatement preparedStatement = null;
                         try {
                             preparedStatement = remoteConnection.prepareStatement(sql);

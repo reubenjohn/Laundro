@@ -26,7 +26,7 @@ public class PointListItem {
         public String views;
 
         public PointItem(ResultSet rs, Context context) throws SQLException {
-            PID = String.valueOf(rs.getInt("PID"));
+            PID = String.valueOf(rs.getInt("_id"));
             poster = rs.getString("poster");
             title = rs.getString("title");
             views = "" + rs.getString("views") + " "

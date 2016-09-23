@@ -46,7 +46,7 @@ public class PointViewerFragment extends Fragment implements View.OnClickListene
     private String PID;
     private String username;
     private PointViewerResult pointViewerResult;
-    private PointListFragment forListF, againstListF;
+    private ServiceListFragment forListF, againstListF;
     private Button commentB;
     private ImageButton imageButtonLike;
     private ImageButton imageButtonDislike;
@@ -76,7 +76,7 @@ public class PointViewerFragment extends Fragment implements View.OnClickListene
             @Override
             public PreparedStatement onGetPreparedStatement(BackendConnection remoteConnection) {
 
-                String sql = "SELECT * from TopicViewer where PID = ?";
+                String sql = "SELECT * from TopicViewer where _id = ?";
                 PreparedStatement preparedStatement = null;
                 try {
                     preparedStatement = remoteConnection.prepareStatement(sql);
@@ -116,7 +116,7 @@ public class PointViewerFragment extends Fragment implements View.OnClickListene
             public PreparedStatement onGetPreparedStatement(BackendConnection remoteConnection) {
                 PreparedStatement preparedStatement = null;
                 try {
-                    preparedStatement = remoteConnection.prepareStatement("Select updown from votespoint where username=? and PID=?");
+                    preparedStatement = remoteConnection.prepareStatement("Select updown from votespoint where username=? and _id=?");
                     preparedStatement.setString(1, username);
                     preparedStatement.setString(2, PID);
                 } catch (SQLException e) {
@@ -248,11 +248,11 @@ public class PointViewerFragment extends Fragment implements View.OnClickListene
     private void openForListFragment() {
         // find the retained fragment on activity restarts
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        forListF = (PointListFragment) fm.findFragmentByTag(Constants.tags.pointListForFragment);
+        forListF = (ServiceListFragment) fm.findFragmentByTag(Constants.tags.pointListForFragment);
 
         if (!asserter.assertPointerQuietly(forListF)) {
-            l.i("Creating new " + PointListFragment.class.getSimpleName() + " fragment");
-            forListF = PointListFragment.newInstance(1, PID, 'S');
+            l.i("Creating new " + ServiceListFragment.class.getSimpleName() + " fragment");
+            forListF = ServiceListFragment.newInstance(1, PID, 'S');
             fm.beginTransaction()
                     .replace(R.id.container_point_viewer_for, forListF, Constants.tags.pointListForFragment)
                     .commit();
@@ -262,11 +262,11 @@ public class PointViewerFragment extends Fragment implements View.OnClickListene
     private void openAgainstListFragment() {
         // find the retained fragment on activity restarts
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        againstListF = (PointListFragment) fm.findFragmentByTag(Constants.tags.pointListAgainstFragment);
+        againstListF = (ServiceListFragment) fm.findFragmentByTag(Constants.tags.pointListAgainstFragment);
 
         if (!asserter.assertPointerQuietly(againstListF)) {
-            l.i("Creating new " + PointListFragment.class.getSimpleName() + " fragment");
-            againstListF = PointListFragment.newInstance(1, PID, 'O');
+            l.i("Creating new " + ServiceListFragment.class.getSimpleName() + " fragment");
+            againstListF = ServiceListFragment.newInstance(1, PID, 'O');
             fm.beginTransaction()
                     .replace(R.id.container_point_viewer_against, againstListF, Constants.tags.pointListAgainstFragment)
                     .commit();
@@ -293,7 +293,7 @@ public class PointViewerFragment extends Fragment implements View.OnClickListene
             public PreparedStatement onGetPreparedStatement(BackendConnection remoteConnection) {
                 PreparedStatement preparedStatement = null;
                 try {
-                    preparedStatement = remoteConnection.prepareStatement("DELETE FROM votespoint where username=? and PID=?");
+                    preparedStatement = remoteConnection.prepareStatement("DELETE FROM votespoint where username=? and _id=?");
                     preparedStatement.setString(1, username);
                     preparedStatement.setString(2, PID);
 
@@ -364,7 +364,7 @@ public class PointViewerFragment extends Fragment implements View.OnClickListene
         } else if (id == R.id.b_point_viewer_comments) {
             l.d("Opening comments");
             Intent i = new Intent(getActivity(), com.aspirephile.laundro.comment.CommentListActivity.class);
-            i.putExtra(Constants.extras.PID, PID);
+            i.putExtra(Constants.extras._id, PID);
             startActivity(i);
         } else if (id == R.id.image_button_dislike) {
             performVote("D");

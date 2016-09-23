@@ -68,9 +68,9 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecy
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            descView = (TextView) view.findViewById(R.id.tv_item_point_views);
-            timestampView = (TextView) view.findViewById(R.id.tv_item_point_views);
-            usernameView = (TextView) view.findViewById(R.id.tv_item_point_views);             //What to do?
+            descView = (TextView) view.findViewById(R.id.tv_item_service_created_at);
+            timestampView = (TextView) view.findViewById(R.id.tv_item_service_created_at);
+            usernameView = (TextView) view.findViewById(R.id.tv_item_service_created_at);             //What to do?
         }
 
     }

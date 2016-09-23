@@ -1,6 +1,7 @@
 package com.aspirephile.laundro.db;
 
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 
 import com.aspirephile.laundro.db.LaundroContract.User;
@@ -8,11 +9,20 @@ import com.aspirephile.laundro.db.LaundroContract.User;
 /**
  * Created by Reuben John on 9/9/2016.
  */
-public class UserManager {
-    private final LaundroDb dbHelper;
+public class UserManager extends TableManager {
 
     public UserManager(LaundroDb dbHelper) {
-        this.dbHelper = dbHelper;
+        super(dbHelper);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(User.SQL_CREATE_ENTRIES);
+    }
+
+    @Override
+    public void onDestroy(SQLiteDatabase db) {
+        db.execSQL(User.SQL_DELETE_ENTRIES);
     }
 
     public boolean checkUserAuthenticationResult(Cursor c) {
@@ -37,4 +47,5 @@ public class UserManager {
                 null);
         return new LaundroQuery(dbHelper, query, new String[]{email});
     }
+
 }

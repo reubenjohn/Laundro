@@ -120,7 +120,7 @@ public class CommentListFragment extends Fragment implements SwipeRefreshLayout.
                 "username as username_comment, " +
                 "description as description_comment, " +
                 "timestamp as timestamp_comment"+
-                "FROM ParlayComment"+"WHERE PID=OURPID";                    //INSERT PID SOMEHOW
+                "FROM ParlayComment"+"WHERE _id=OURPID";                    //INSERT _id SOMEHOW
         OnQueryComplete<CommentListItem.CommentItem> onQueryCompleteListener = new OnQueryComplete<CommentListItem.CommentItem>() {
             @Override
             public void onQueryComplete(List<CommentListItem.CommentItem> list, SQLException e1) {

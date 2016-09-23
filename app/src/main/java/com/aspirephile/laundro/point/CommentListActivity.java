@@ -32,10 +32,10 @@ public class CommentListActivity extends AppCompatActivity implements CommentLis
             data.putExtra(Constants.extras.errorResult, Constants.errorResults.badIntent);
             setResult(RESULT_CANCELED, data);
             return;
-        } else if ((PID = i.getStringExtra(Constants.extras.PID)) == null) {
+        } else if ((PID = i.getStringExtra(Constants.extras._id)) == null) {
             Intent data = new Intent();
             data.putExtra(Constants.extras.errorResult, Constants.errorResults.badPID);
-            data.putExtra(Constants.extras.PID, PID);
+            data.putExtra(Constants.extras._id, PID);
             setResult(RESULT_CANCELED, data);
             return;
         }
@@ -53,7 +53,7 @@ public class CommentListActivity extends AppCompatActivity implements CommentLis
 
         if (!asserter.assertPointerQuietly(commentListF)) {
             l.i("Creating new " + CommentListFragment.class.getSimpleName() + " fragment");
-            commentListF = CommentListFragment.newInstance(1);//TODO Set PID from constructor
+            commentListF = CommentListFragment.newInstance(1);//TODO Set _id from constructor
             fm.beginTransaction()
                     .replace(R.id.container_comment_list, commentListF, Constants.tags.commentListFragment)
                     .commit();

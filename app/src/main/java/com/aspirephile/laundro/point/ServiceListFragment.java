@@ -1,6 +1,7 @@
 package com.aspirephile.laundro.point;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.aspirephile.laundro.R;
+import com.aspirephile.laundro.db.LaundroDb;
+import com.aspirephile.laundro.db.OnQueryCompleteListener;
+import com.aspirephile.laundro.db.tables.Service;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
@@ -34,18 +38,18 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class PointListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener {
+public class ServiceListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private static final String ARG_PID = "PID";
+    private static final String ARG_PID = "_id";
     private static final String ARG_STANDING = "STANDING";
-    private Logger l = new Logger(PointListFragment.class);
+    private Logger l = new Logger(ServiceListFragment.class);
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
 
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
-    private List<PointListItem.PointItem> pointItems = new ArrayList<>();
+    private List<Service> pointItems = new ArrayList<>();
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private String PID;
@@ -55,19 +59,19 @@ public class PointListFragment extends Fragment implements SwipeRefreshLayout.On
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public PointListFragment() {
+    public ServiceListFragment() {
     }
 
-    public static PointListFragment newInstance(int columnCount) {
-        PointListFragment fragment = new PointListFragment();
+    public static ServiceListFragment newInstance(int columnCount) {
+        ServiceListFragment fragment = new ServiceListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
         return fragment;
     }
 
-    public static PointListFragment newInstance(int columnCount, @NonNull String PID, char standing) {
-        PointListFragment fragment = new PointListFragment();
+    public static ServiceListFragment newInstance(int columnCount, @NonNull String PID, char standing) {
+        ServiceListFragment fragment = new ServiceListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         args.putString(ARG_PID, PID);
@@ -106,7 +110,7 @@ public class PointListFragment extends Fragment implements SwipeRefreshLayout.On
         } else {
             recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
         }
-        recyclerView.setAdapter(new PointRecyclerViewAdapter(pointItems, mListener));
+        recyclerView.setAdapter(new ServiceRecyclerViewAdapter(pointItems, mListener));
 
         return view;
     }
@@ -135,62 +139,16 @@ public class PointListFragment extends Fragment implements SwipeRefreshLayout.On
         if (swipeRefreshLayout != null)
             swipeRefreshLayout.setRefreshing(true);
 
-        OnGetPrepareStatement getPreparedStatementListener = new OnGetPrepareStatement() {
+        LaundroDb.getServiceManager().getServiceQuery().queryInBackground(new OnQueryCompleteListener() {
             @Override
-            public PreparedStatement onGetPreparedStatement(BackendConnection remoteConnection) {
-                try {
-                    String sql;
-                    PreparedStatement preparedStatement;
-                    if (standing != '\0') {
-                        sql = "SELECT * from Topic " +
-                                "where PID in " +
-                                "(" +
-                                "select child from PointRole " +
-                                "where " +
-                                "parent=? " +
-                                "and " +
-                                "standing='" + standing + "' " +
-                                ")";
-                        preparedStatement = remoteConnection.prepareStatement(sql);
-                        preparedStatement.setString(1, PID);
-//                        preparedStatement.setString(2, String.valueOf(standing));
-                    } else {
-                        sql = "SELECT * FROM Question";
-                        preparedStatement = remoteConnection.prepareStatement(sql);
-                    }
-                    return preparedStatement;
-                } catch (SQLException e) {
-                    mListener.onPointListLoadFailed(e);
-                    return null;
-                }
+            public void onQueryComplete(Cursor c) {
+                List<Service> list = LaundroDb.getServiceManager().getServiceFromResult(c);
+                l.i("Point query completed with " + list.size() + " results");
+                if (asserter.assertPointer(recyclerView))
+                    recyclerView.setAdapter(new ServiceRecyclerViewAdapter(list, mListener));
+                swipeRefreshLayout.setRefreshing(false);
             }
-        };
-
-        OnGetResultSetListener onGetResultSetListener = new OnGetResultSetListener() {
-            @Override
-            public void onGetResultSet(ResultSet rs, SQLException e) {
-                if (e != null) {
-                    mListener.onPointListLoadFailed(e);
-                } else {
-                    ArrayList<PointListItem.PointItem> list = new ArrayList<>();
-                    Context context = getContext();
-                    try {
-                        while (rs.next()) {
-                            list.add(new PointListItem.PointItem(rs, context));
-                        }
-
-                        l.i("Point query completed with " + list.size() + " results");
-                        if (asserter.assertPointer(recyclerView))
-                            recyclerView.setAdapter(new PointRecyclerViewAdapter(list, mListener));
-                        swipeRefreshLayout.setRefreshing(false);
-
-                    } catch (SQLException e1) {
-                        mListener.onPointListLoadFailed(e1);
-                    }
-                }
-            }
-        };
-        AceQLDBManager.executeQuery(getPreparedStatementListener, onGetResultSetListener);
+        });
     }
 
     @Override
@@ -214,7 +172,7 @@ public class PointListFragment extends Fragment implements SwipeRefreshLayout.On
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        void onPointListItemSelected(PointListItem.PointItem item);
+        void onPointListItemSelected(Service item);
 
         void onPointListLoadFailed(SQLException e);
     }

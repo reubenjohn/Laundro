@@ -14,6 +14,6 @@
         android:layout_marginRight="16dp"
         app:layoutManager="LinearLayoutManager"
         tools:context=".pointCreatorItem.PointListFragment"
-        tools:listitem="@layout/list_item_point" />
+        tools:listitem="@layout/list_item_service" />
 
 </android.support.v4.widget.SwipeRefreshLayout>

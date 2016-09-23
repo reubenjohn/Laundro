@@ -19,37 +19,37 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.aspirephile.laundro.preferences.SettingsActivity;
+import com.aspirephile.laundro.db.tables.Service;
 import com.aspirephile.laundro.point.PointCreatorActivity;
-import com.aspirephile.laundro.point.PointListFragment;
-import com.aspirephile.laundro.point.PointListItem;
+import com.aspirephile.laundro.point.ServiceListFragment;
 import com.aspirephile.laundro.point.PointViewerActivity;
+import com.aspirephile.laundro.preferences.SettingsActivity;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
 import java.sql.SQLException;
 
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, PointListFragment.OnListFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener, ServiceListFragment.OnListFragmentInteractionListener {
 
     private Logger l = new Logger(HomeActivity.class);
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
     private SearchView searchView;
 
-    private PointListFragment pointListF;
+    private ServiceListFragment pointListF;
     private CoordinatorLayout coordinatorLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(com.aspirephile.laundro.R.layout.activity_home);
+        setContentView(R.layout.activity_home);
 
-        Toolbar toolbar = (Toolbar) findViewById(com.aspirephile.laundro.R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        coordinatorLayout = (CoordinatorLayout) findViewById(com.aspirephile.laundro.R.id.cl_home);
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.cl_home);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(com.aspirephile.laundro.R.id.fab_point_list);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_point_list);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -58,14 +58,14 @@ public class HomeActivity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(com.aspirephile.laundro.R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, com.aspirephile.laundro.R.string.navigation_drawer_open, com.aspirephile.laundro.R.string.navigation_drawer_close);
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         //noinspection deprecation
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(com.aspirephile.laundro.R.id.nav_view);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         View v = navigationView.getHeaderView(0);
@@ -86,11 +86,11 @@ public class HomeActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Constants.codes.result.point_creator) {
             if (resultCode == Activity.RESULT_OK) {
-                Snackbar.make(coordinatorLayout, com.aspirephile.laundro.R.string.point_creator_success, Snackbar.LENGTH_LONG)
-                        .setAction(com.aspirephile.laundro.R.string.undo, null).show();
+                Snackbar.make(coordinatorLayout, R.string.point_creator_success, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.undo, null).show();
             } else {
-                Snackbar.make(coordinatorLayout, com.aspirephile.laundro.R.string.point_creator_failure, Snackbar.LENGTH_LONG)
-                        .setAction(com.aspirephile.laundro.R.string.try_again, null).show();
+                Snackbar.make(coordinatorLayout, R.string.point_creator_failure, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.try_again, null).show();
                 //TODO Also pass and display the reason for the error from the point creator
             }
         } else {
@@ -102,13 +102,13 @@ public class HomeActivity extends AppCompatActivity
     private void openPointListFragment() {
         // find the retained fragment on activity restarts
         FragmentManager fm = getSupportFragmentManager();
-        pointListF = (PointListFragment) fm.findFragmentByTag(Constants.tags.pointListFragment);
+        pointListF = (ServiceListFragment) fm.findFragmentByTag(Constants.tags.pointListFragment);
 
         if (!asserter.assertPointerQuietly(pointListF)) {
-            l.i("Creating new " + PointListFragment.class.getSimpleName() + " fragment");
-            pointListF = PointListFragment.newInstance(1);
+            l.i("Creating new " + ServiceListFragment.class.getSimpleName() + " fragment");
+            pointListF = ServiceListFragment.newInstance(1);
             fm.beginTransaction()
-                    .replace(com.aspirephile.laundro.R.id.container_home, pointListF, Constants.tags.pointListFragment)
+                    .replace(R.id.container_home, pointListF, Constants.tags.pointListFragment)
                     .commit();
         }
         if (asserter.assertPointer(pointListF, searchView)) {
@@ -118,7 +118,7 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(com.aspirephile.laundro.R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -129,8 +129,8 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(com.aspirephile.laundro.R.menu.home, menu);
-        searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(com.aspirephile.laundro.R.id.home_action_search));
+        getMenuInflater().inflate(R.menu.home, menu);
+        searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.home_action_search));
         if (pointListF != null)
             searchView.setOnQueryTextListener(pointListF);
         return true;
@@ -144,11 +144,11 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == com.aspirephile.laundro.R.id.home_action_settings) {
+        if (id == R.id.home_action_settings) {
             Intent i = new Intent(HomeActivity.this, SettingsActivity.class);
             startActivity(i);
             return true;
-        } else if (id == com.aspirephile.laundro.R.id.home_action_search) {
+        } else if (id == R.id.home_action_search) {
 
             return true;
         }
@@ -162,37 +162,37 @@ public class HomeActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == com.aspirephile.laundro.R.id.nav_camera) {
+        if (id == R.id.nav_camera) {
             // Handle the camera action
-        } else if (id == com.aspirephile.laundro.R.id.nav_gallery) {
+        } else if (id == R.id.nav_gallery) {
 
-        } else if (id == com.aspirephile.laundro.R.id.nav_slideshow) {
+        } else if (id == R.id.nav_slideshow) {
 
-        } else if (id == com.aspirephile.laundro.R.id.nav_manage) {
+        } else if (id == R.id.nav_manage) {
 
-        } else if (id == com.aspirephile.laundro.R.id.nav_share) {
+        } else if (id == R.id.nav_share) {
 
-        } else if (id == com.aspirephile.laundro.R.id.nav_send) {
+        } else if (id == R.id.nav_send) {
 
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(com.aspirephile.laundro.R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
     @Override
-    public void onPointListItemSelected(PointListItem.PointItem item) {
+    public void onPointListItemSelected(Service item) {
         //TODO Open the right point here
         Intent i = new Intent(HomeActivity.this, PointViewerActivity.class);
-        i.putExtra(Constants.extras.PID, item.PID);
+        i.putExtra(Constants.extras._id, item._id);
         startActivityForResult(i, Constants.codes.result.point_viewer);
     }
 
     @Override
     public void onPointListLoadFailed(SQLException e) {
-        Snackbar.make(coordinatorLayout, com.aspirephile.laundro.R.string.point_list_fetch_failed, Snackbar.LENGTH_INDEFINITE)
-                .setAction(com.aspirephile.laundro.R.string.retry, new View.OnClickListener() {
+        Snackbar.make(coordinatorLayout, R.string.point_list_fetch_failed, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (asserter.assertPointer(pointListF))

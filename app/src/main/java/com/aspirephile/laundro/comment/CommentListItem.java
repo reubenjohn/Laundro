@@ -24,7 +24,7 @@ public class CommentListItem {
         public final String description;
 
         public CommentItem(ResultSet rs, Context context) throws SQLException {
-            PID = rs.getString("PID");
+            PID = rs.getString("_id");
             CID = rs.getString("CID");
             poster = rs.getString("poster");
             timestamp = rs.getTimestamp("timestamp");

@@ -12,6 +12,8 @@ public final class LaundroContract {
     }
 
     private static final String TEXT_TYPE = "varchar(50)";
+    private static final String DATE_TYPE = "date";
+    private static final String LONG_TYPE = "long";
     private static final String COMMA_SEP = ",";
 
     /* Inner class that defines the table contents */
@@ -25,6 +27,22 @@ public final class LaundroContract {
                         _ID + " INTEGER PRIMARY KEY," +
                         COLUMN_NAME_EMAIL + " " + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_NAME + " " + TEXT_TYPE + " )";
+        public static final String SQL_DELETE_ENTRIES =
+                "DROP TABLE " + TABLE_NAME;
+    }
+
+    public class Service implements BaseColumns {
+        public static final String TABLE_NAME = "Service";
+        public static final String COLUMN_NAME_CREATED_AT = "createdAt";
+        public static final String COLUMN_NAME_NAME = "name";
+        public static final String COLUMN_NAME_LOCATION = "location";
+        //TODO Ensure distinct emails
+        public static final String SQL_CREATE_ENTRIES =
+                "CREATE TABLE " + TABLE_NAME + " ( " +
+                        _ID + " INTEGER PRIMARY KEY" + COMMA_SEP +
+                        COLUMN_NAME_CREATED_AT + " " + LONG_TYPE + COMMA_SEP +
+                        COLUMN_NAME_NAME + " " + TEXT_TYPE + COMMA_SEP +
+                        COLUMN_NAME_LOCATION + " " + TEXT_TYPE + " )";
         public static final String SQL_DELETE_ENTRIES =
                 "DROP TABLE " + TABLE_NAME;
     }
