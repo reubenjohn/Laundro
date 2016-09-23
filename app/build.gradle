@@ -10,7 +10,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.aspirephile.parlayultimatum"
+        applicationId "com.aspirephile.laundro"
         minSdkVersion 11
         targetSdkVersion 23
         versionCode 1
