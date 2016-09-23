@@ -33,10 +33,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-public class PointViewerFragment extends Fragment implements View.OnClickListener {
+public class ServiceViewerFragment extends Fragment implements View.OnClickListener {
 
     OnFragmentInteractionListener fragmentInteractionListener;
-    private Logger l = new Logger(PointViewerFragment.class);
+    private Logger l = new Logger(ServiceViewerFragment.class);
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
 
     private CoordinatorLayout coordinatorLayout;
@@ -45,13 +45,13 @@ public class PointViewerFragment extends Fragment implements View.OnClickListene
     private TextView descriptionView;
     private String PID;
     private String username;
-    private PointViewerResult pointViewerResult;
+    private ServiceViewerResult serviceViewerResult;
     private ServiceListFragment forListF, againstListF;
     private Button commentB;
     private ImageButton imageButtonLike;
     private ImageButton imageButtonDislike;
 
-    public PointViewerFragment() {
+    public ServiceViewerFragment() {
         l.onConstructor();
     }
 
@@ -97,8 +97,8 @@ public class PointViewerFragment extends Fragment implements View.OnClickListene
                     try {
                         if (rs != null) {
                             rs.next();
-                            pointViewerResult = new PointViewerResult(rs, getContext());
-                            updateViews(pointViewerResult);
+                            serviceViewerResult = new ServiceViewerResult(rs, getContext());
+                            updateViews(serviceViewerResult);
                         } else {
                             fragmentInteractionListener.onPointNotFound();
                         }
@@ -116,7 +116,7 @@ public class PointViewerFragment extends Fragment implements View.OnClickListene
             public PreparedStatement onGetPreparedStatement(BackendConnection remoteConnection) {
                 PreparedStatement preparedStatement = null;
                 try {
-                    preparedStatement = remoteConnection.prepareStatement("Select updown from votespoint where username=? and _id=?");
+                    preparedStatement = remoteConnection.prepareStatement("Select updown from votespoint where email=? and _id=?");
                     preparedStatement.setString(1, username);
                     preparedStatement.setString(2, PID);
                 } catch (SQLException e) {
@@ -162,8 +162,8 @@ public class PointViewerFragment extends Fragment implements View.OnClickListene
         if (asserter.assertPointer(v))
             bridgeXML(v);
         initializeFields();
-        if (pointViewerResult != null)
-            updateViews(pointViewerResult);
+        if (serviceViewerResult != null)
+            updateViews(serviceViewerResult);
         imageButtonLike = (ImageButton) v.findViewById(R.id.image_button_like);
         imageButtonDislike = (ImageButton) v.findViewById(R.id.image_button_dislike);
         imageButtonDislike.setOnClickListener(this);
@@ -273,7 +273,7 @@ public class PointViewerFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    private void updateViews(PointViewerResult point) {
+    private void updateViews(ServiceViewerResult point) {
         collapsingToolbarLayout.setTitle(point.getTitle());
         descriptionView.setText(point.getDescription());
         //TODO Fill other fields here
@@ -293,7 +293,7 @@ public class PointViewerFragment extends Fragment implements View.OnClickListene
             public PreparedStatement onGetPreparedStatement(BackendConnection remoteConnection) {
                 PreparedStatement preparedStatement = null;
                 try {
-                    preparedStatement = remoteConnection.prepareStatement("DELETE FROM votespoint where username=? and _id=?");
+                    preparedStatement = remoteConnection.prepareStatement("DELETE FROM votespoint where email=? and _id=?");
                     preparedStatement.setString(1, username);
                     preparedStatement.setString(2, PID);
 

@@ -60,7 +60,7 @@ public class CommentListActivity extends AppCompatActivity implements CommentLis
                 AceQLDBManager.executeUpdate(new OnGetPrepareStatement() {
                     @Override
                     public PreparedStatement onGetPreparedStatement(BackendConnection remoteConnection) {
-                        String sql = "insert into ParlayComment (_id,username,description) values (?,?,?)";
+                        String sql = "insert into ParlayComment (_id,email,description) values (?,?,?)";
                         PreparedStatement preparedStatement = null;
                         try {
                             preparedStatement = remoteConnection.prepareStatement(sql);

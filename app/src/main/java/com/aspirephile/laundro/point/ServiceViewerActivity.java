@@ -9,15 +9,14 @@ import android.view.MenuItem;
 
 import com.aspirephile.laundro.Constants;
 import com.aspirephile.laundro.R;
-import com.aspirephile.laundro.db.tables.Service;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
 import java.sql.SQLException;
 
-public class PointViewerActivity extends AppCompatActivity implements PointViewerFragment.OnFragmentInteractionListener {
+public class ServiceViewerActivity extends AppCompatActivity implements ServiceViewerFragment.OnFragmentInteractionListener {
 
-    private Logger l = new Logger(PointViewerActivity.class);
+    private Logger l = new Logger(ServiceViewerActivity.class);
 
     private String PID;
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
@@ -50,11 +49,11 @@ public class PointViewerActivity extends AppCompatActivity implements PointViewe
     private void openPointViewerFragment() {
         // find the retained fragment on activity restarts
         FragmentManager fm = getSupportFragmentManager();
-        PointViewerFragment pointViewerF = (PointViewerFragment) fm.findFragmentByTag(Constants.tags.pointViewerFragment);
+        ServiceViewerFragment pointViewerF = (ServiceViewerFragment) fm.findFragmentByTag(Constants.tags.pointViewerFragment);
 
         if (!asserter.assertPointerQuietly(pointViewerF)) {
-            l.i("Creating new " + PointViewerFragment.class.getSimpleName() + " fragment");
-            pointViewerF = new PointViewerFragment();
+            l.i("Creating new " + ServiceViewerFragment.class.getSimpleName() + " fragment");
+            pointViewerF = new ServiceViewerFragment();
             fm.beginTransaction()
                     .replace(R.id.container_point_viewer, pointViewerF, Constants.tags.pointViewerFragment)
                     .commit();

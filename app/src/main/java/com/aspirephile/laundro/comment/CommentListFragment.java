@@ -118,7 +118,7 @@ public class CommentListFragment extends Fragment implements SwipeRefreshLayout.
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setRefreshing(true);
         }
-        final String sql = "select username as poster, _id, CID, timestamp, description from ParlayComment where _id=? order by CID desc";
+        final String sql = "select email as poster, _id, CID, timestamp, description from ParlayComment where _id=? order by CID desc";
 
         OnGetPrepareStatement getPreparedStatementListener = new OnGetPrepareStatement() {
             @Override

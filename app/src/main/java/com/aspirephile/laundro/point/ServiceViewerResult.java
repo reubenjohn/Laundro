@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 /**
  * Created and maintained by Reuben John on 3/13/2016.
  */
-public class PointViewerResult {
+public class ServiceViewerResult {
 
     private final String PID;
     private final String poster;
@@ -22,7 +22,7 @@ public class PointViewerResult {
     private final short upVotesPercentage;
     private final String tag1, tag2, tag3, tag4;
 
-    public PointViewerResult(ResultSet rs, Context context) throws SQLException {
+    public ServiceViewerResult(ResultSet rs, Context context) throws SQLException {
         if (context == null)
             throw new IllegalArgumentException("Cannot provide a null context!");
 

@@ -20,9 +20,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.aspirephile.laundro.db.tables.Service;
-import com.aspirephile.laundro.point.PointCreatorActivity;
+import com.aspirephile.laundro.point.ServiceCreatorActivity;
 import com.aspirephile.laundro.point.ServiceListFragment;
-import com.aspirephile.laundro.point.PointViewerActivity;
+import com.aspirephile.laundro.point.ServiceViewerActivity;
 import com.aspirephile.laundro.preferences.SettingsActivity;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
@@ -53,7 +53,7 @@ public class HomeActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(HomeActivity.this, PointCreatorActivity.class);
+                Intent i = new Intent(HomeActivity.this, ServiceCreatorActivity.class);
                 startActivityForResult(i, Constants.codes.result.point_creator);
             }
         });
@@ -184,7 +184,7 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onPointListItemSelected(Service item) {
         //TODO Open the right point here
-        Intent i = new Intent(HomeActivity.this, PointViewerActivity.class);
+        Intent i = new Intent(HomeActivity.this, ServiceViewerActivity.class);
         i.putExtra(Constants.extras._id, item._id);
         startActivityForResult(i, Constants.codes.result.point_viewer);
     }

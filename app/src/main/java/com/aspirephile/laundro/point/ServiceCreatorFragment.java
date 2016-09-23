@@ -27,10 +27,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PointCreatorFragment extends Fragment implements View.OnClickListener {
+public class ServiceCreatorFragment extends Fragment implements View.OnClickListener {
 
     PointCreatorListener pointCreatorListener;
-    private Logger l = new Logger(PointCreatorFragment.class);
+    private Logger l = new Logger(ServiceCreatorFragment.class);
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
     private CoordinatorLayout coordinatorLayout;
     private CollapsingToolbarLayout collapsingToolbarLayout;
@@ -38,7 +38,7 @@ public class PointCreatorFragment extends Fragment implements View.OnClickListen
     private TextInputLayout titleContainer, descriptionContainer;
     private Snackbar invalidFieldsSnackbar;
 
-    public PointCreatorFragment() {
+    public ServiceCreatorFragment() {
         l.onConstructor();
     }
 
@@ -209,19 +209,19 @@ public class PointCreatorFragment extends Fragment implements View.OnClickListen
     private void createPoint() {
         if (isFieldsValid()) {
             l.d("Creating point");
-            final PointCreatorItem pointCreatorItem = new PointCreatorItem();
+            final ServiceCreatorItem serviceCreatorItem = new ServiceCreatorItem();
             if (isContainerEditTextAvailable()) {
                 Snackbar.make(coordinatorLayout, R.string.point_creator_creating, Snackbar.LENGTH_INDEFINITE)
                         .show();
-                pointCreatorItem.setUsername(getActivity().getSharedPreferences(Constants.files.authentication, Context.MODE_PRIVATE)
+                serviceCreatorItem.setUsername(getActivity().getSharedPreferences(Constants.files.authentication, Context.MODE_PRIVATE)
                         .getString(Constants.preferences.username, null));
                 //noinspection ConstantConditions
-                pointCreatorItem.setTitle(titleContainer.getEditText().getText().toString());
+                serviceCreatorItem.setTitle(titleContainer.getEditText().getText().toString());
                 //noinspection ConstantConditions
-                pointCreatorItem.setDescription(descriptionContainer.getEditText().getText().toString());
+                serviceCreatorItem.setDescription(descriptionContainer.getEditText().getText().toString());
 
-                List<PointCreatorItem> list = new ArrayList<>();
-                list.add(pointCreatorItem);
+                List<ServiceCreatorItem> list = new ArrayList<>();
+                list.add(serviceCreatorItem);
                 AceQLDBManager.insertSQLEntityList(list, new OnUpdateCompleteListener() {
                     @Override
                     public void onUpdateComplete(int result, SQLException e) {

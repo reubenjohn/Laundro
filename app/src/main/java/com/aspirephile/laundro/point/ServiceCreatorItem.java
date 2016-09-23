@@ -7,7 +7,7 @@ import org.kawanfw.sql.api.client.android.execute.update.SQLEntity;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class PointCreatorItem implements SQLEntity {
+public class ServiceCreatorItem implements SQLEntity {
     private String title;
     private String description;
     private String username;
@@ -43,7 +43,7 @@ public class PointCreatorItem implements SQLEntity {
 
     @Override
     public String[] getAttributeNames() {
-        return new String[]{"username", "title", "description"};
+        return new String[]{"email", "title", "description"};
     }
 
     @Override

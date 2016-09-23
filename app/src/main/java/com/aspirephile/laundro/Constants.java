@@ -28,7 +28,7 @@ public class Constants {
 
     public static final class preferences {
 
-        public static final String username = "username";
+        public static final String username = "email";
         public static final String url = "url";
 
         public static final class pointCreator {

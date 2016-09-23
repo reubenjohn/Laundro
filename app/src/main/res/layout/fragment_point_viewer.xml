@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".point.PointViewerActivity">
+    tools:context=".point.ServiceViewerActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
@@ -40,7 +40,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context=".pointCreatorItem.PointViewerActivity"
+        tools:context=".serviceCreatorItem.PointViewerActivity"
         tools:showIn="@layout/activity_point_viewer">
 
         <LinearLayout

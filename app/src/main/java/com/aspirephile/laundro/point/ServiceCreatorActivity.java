@@ -11,8 +11,8 @@ import com.aspirephile.laundro.R;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
-public class PointCreatorActivity extends AppCompatActivity implements PointCreatorFragment.PointCreatorListener {
-    private Logger l = new Logger(PointCreatorActivity.class);
+public class ServiceCreatorActivity extends AppCompatActivity implements ServiceCreatorFragment.PointCreatorListener {
+    private Logger l = new Logger(ServiceCreatorActivity.class);
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
 
     @Override
@@ -86,11 +86,11 @@ public class PointCreatorActivity extends AppCompatActivity implements PointCrea
     private void openOrganizationCreatorFragment() {
         // find the retained fragment on activity restarts
         FragmentManager fm = getSupportFragmentManager();
-        PointCreatorFragment organizationCreatorF = (PointCreatorFragment) fm.findFragmentByTag(Constants.tags.pointViewerFragment);
+        ServiceCreatorFragment organizationCreatorF = (ServiceCreatorFragment) fm.findFragmentByTag(Constants.tags.pointViewerFragment);
 
         if (!asserter.assertPointerQuietly(organizationCreatorF)) {
-            l.i("Creating new " + PointCreatorFragment.class.getSimpleName() + " fragment");
-            organizationCreatorF = new PointCreatorFragment();
+            l.i("Creating new " + ServiceCreatorFragment.class.getSimpleName() + " fragment");
+            organizationCreatorF = new ServiceCreatorFragment();
             fm.beginTransaction()
                     .replace(R.id.container_organization_creator, organizationCreatorF, Constants.tags.pointViewerFragment)
                     .commit();
