@@ -5,13 +5,13 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.aspirephile.shared.debug.Logger;
 
-public class LaundroQuery {
+public class QueryStatement {
     private final LaundroDb dbHelper;
     private final String query;
     private final String[] selectionArgs;
-    private Logger l = new Logger(LaundroQuery.class);
+    private Logger l = new Logger(QueryStatement.class);
 
-    LaundroQuery(LaundroDb dbHelper, String sql, String[] selectionArgs) {
+    QueryStatement(LaundroDb dbHelper, String sql, String[] selectionArgs) {
         this.dbHelper = dbHelper;
         this.query = sql;
         this.selectionArgs = selectionArgs;

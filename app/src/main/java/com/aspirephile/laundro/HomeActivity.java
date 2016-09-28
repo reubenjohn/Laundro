@@ -2,6 +2,7 @@ package com.aspirephile.laundro;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -26,8 +27,6 @@ import com.aspirephile.laundro.point.ServiceViewerActivity;
 import com.aspirephile.laundro.preferences.SettingsActivity;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
-
-import java.sql.SQLException;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, ServiceListFragment.OnListFragmentInteractionListener {

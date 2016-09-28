@@ -12,6 +12,7 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -173,20 +174,26 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     .queryInBackground(new OnQueryCompleteListener() {
                         @SuppressLint("CommitPrefEdits")
                         @Override
-                        public void onQueryComplete(Cursor c) {
-                            boolean isAuthenticated = LaundroDb.getUserManager().checkUserAuthenticationResult(c);
-                            showProgress(false);
-
-                            if (isAuthenticated) {
-                                SharedPreferences sp = getSharedPreferences(Constants.files.authentication, MODE_PRIVATE);
-                                sp.edit().putString(Constants.preferences.username, email)
-//                                    .putString(Constants.preferences.password, password)
-                                        .commit();
-                                setResult(RESULT_OK);
-                                finish();
-                            } else {
-                                mUsernameView.setError(getString(com.aspirephile.laundro.R.string.error_incorrect_username));
+                        public void onQueryComplete(Cursor c, SQLException e) {
+                            if (e != null) {
+                                e.printStackTrace();
+                                mUsernameView.setError(getString(com.aspirephile.laundro.R.string.error_authentication_unknown));
                                 mUsernameView.requestFocus();
+                            } else {
+                                boolean isAuthenticated = LaundroDb.getUserManager().checkUserAuthenticationResult(c);
+                                showProgress(false);
+
+                                if (isAuthenticated) {
+                                    SharedPreferences sp = getSharedPreferences(Constants.files.authentication, MODE_PRIVATE);
+                                    sp.edit().putString(Constants.preferences.username, email)
+//                                    .putString(Constants.preferences.password, password)
+                                            .commit();
+                                    setResult(RESULT_OK);
+                                    finish();
+                                } else {
+                                    mUsernameView.setError(getString(com.aspirephile.laundro.R.string.error_incorrect_username));
+                                    mUsernameView.requestFocus();
+                                }
                             }
                         }
                     });

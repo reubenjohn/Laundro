@@ -18,7 +18,7 @@ public class ServiceViewerActivity extends AppCompatActivity implements ServiceV
 
     private Logger l = new Logger(ServiceViewerActivity.class);
 
-    private String PID;
+    private String _id;
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
 
     @Override
@@ -32,10 +32,10 @@ public class ServiceViewerActivity extends AppCompatActivity implements ServiceV
             data.putExtra(Constants.extras.errorResult, Constants.errorResults.badIntent);
             setResult(RESULT_CANCELED, data);
             return;
-        } else if ((PID = i.getStringExtra(Constants.extras._id)) == null) {
+        } else if ((_id = i.getStringExtra(Constants.extras._id)) == null) {
             Intent data = new Intent();
             data.putExtra(Constants.extras.errorResult, Constants.errorResults.badPID);
-            data.putExtra(Constants.extras._id, PID);
+            data.putExtra(Constants.extras._id, _id);
             setResult(RESULT_CANCELED, data);
             return;
         }
@@ -59,7 +59,7 @@ public class ServiceViewerActivity extends AppCompatActivity implements ServiceV
                     .commit();
         }
         if (asserter.assertPointer(pointViewerF))
-            pointViewerF.setPID(PID);
+            pointViewerF.setID(_id);
     }
 
     @Override

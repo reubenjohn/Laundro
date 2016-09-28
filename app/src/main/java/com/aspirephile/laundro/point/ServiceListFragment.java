@@ -2,6 +2,7 @@ package com.aspirephile.laundro.point;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -21,14 +22,6 @@ import com.aspirephile.laundro.db.tables.Service;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
-import org.kawanfw.sql.api.client.android.AceQLDBManager;
-import org.kawanfw.sql.api.client.android.BackendConnection;
-import org.kawanfw.sql.api.client.android.execute.OnGetPrepareStatement;
-import org.kawanfw.sql.api.client.android.execute.query.OnGetResultSetListener;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,12 +134,17 @@ public class ServiceListFragment extends Fragment implements SwipeRefreshLayout.
 
         LaundroDb.getServiceManager().getServiceQuery().queryInBackground(new OnQueryCompleteListener() {
             @Override
-            public void onQueryComplete(Cursor c) {
-                List<Service> list = LaundroDb.getServiceManager().getServiceFromResult(c);
-                l.i("Point query completed with " + list.size() + " results");
-                if (asserter.assertPointer(recyclerView))
-                    recyclerView.setAdapter(new ServiceRecyclerViewAdapter(list, mListener));
-                swipeRefreshLayout.setRefreshing(false);
+            public void onQueryComplete(Cursor c, SQLException e) {
+                if (e != null) {
+                    e.printStackTrace();
+                    mListener.onPointListLoadFailed(e);
+                } else {
+                    List<Service> list = LaundroDb.getServiceManager().getServiceFromResult(c);
+                    l.i("Point query completed with " + list.size() + " results");
+                    if (asserter.assertPointer(recyclerView))
+                        recyclerView.setAdapter(new ServiceRecyclerViewAdapter(list, mListener));
+                    swipeRefreshLayout.setRefreshing(false);
+                }
             }
         });
     }

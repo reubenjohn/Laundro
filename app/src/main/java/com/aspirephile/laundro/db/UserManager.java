@@ -25,7 +25,7 @@ public class UserManager extends TableManager {
         db.execSQL(User.SQL_DELETE_ENTRIES);
     }
 
-    public LaundroQuery isUserAuthenticated(@NonNull String email) {
+    public QueryStatement isUserAuthenticated(@NonNull String email) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(User.TABLE_NAME);
         String query = qb.buildQuery(new String[]{"count(*)"},
@@ -34,7 +34,7 @@ public class UserManager extends TableManager {
                 null,
                 null,
                 null);
-        return new LaundroQuery(dbHelper, query, new String[]{email});
+        return new QueryStatement(dbHelper, query, new String[]{email});
     }
 
     public boolean checkUserAuthenticationResult(@NonNull Cursor c) {
@@ -48,7 +48,7 @@ public class UserManager extends TableManager {
         }
     }
 
-    public LaundroQuery getUser(@NonNull String email) {
+    public QueryStatement getUser(@NonNull String email) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(User.TABLE_NAME);
         String query = qb.buildQuery(new String[]{User.COLUMN_NAME_EMAIL, User.COLUMN_NAME_NAME},
@@ -57,7 +57,7 @@ public class UserManager extends TableManager {
                 null,
                 null,
                 null);
-        return new LaundroQuery(dbHelper, query, new String[]{email});
+        return new QueryStatement(dbHelper, query, new String[]{email});
     }
 
     public ParlayUser getUserFromResult(Cursor c) {

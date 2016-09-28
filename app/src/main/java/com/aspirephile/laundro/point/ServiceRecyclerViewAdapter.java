@@ -15,12 +15,12 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class ServiceRecyclerViewAdapter extends RecyclerView.Adapter<ServiceRecyclerViewAdapter.ViewHolder> {
+class ServiceRecyclerViewAdapter extends RecyclerView.Adapter<ServiceRecyclerViewAdapter.ViewHolder> {
 
     private final List<Service> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public ServiceRecyclerViewAdapter(List<Service> items, OnListFragmentInteractionListener listener) {
+    ServiceRecyclerViewAdapter(List<Service> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -58,16 +58,16 @@ public class ServiceRecyclerViewAdapter extends RecyclerView.Adapter<ServiceRecy
         return mValues.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView createdAtView;
-        public final TextView nameView;
-        public final TextView locationView;
-        public final ProgressBar ratingView;
+    class ViewHolder extends RecyclerView.ViewHolder {
+        final View mView;
+        final TextView createdAtView;
+        final TextView nameView;
+        final TextView locationView;
+        final ProgressBar ratingView;
         //public final TextView tag1View, tag2View, tag3View, tag4View;
-        public Service mItem;
+        Service mItem;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
             mView = view;
             createdAtView = (TextView) view.findViewById(R.id.tv_item_service_created_at);

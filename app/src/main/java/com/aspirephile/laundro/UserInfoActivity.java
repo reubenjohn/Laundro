@@ -65,9 +65,15 @@ public class UserInfoActivity extends AppCompatActivity implements View.OnClickL
 
         LaundroDb.getUserManager().getUser(email).queryInBackground(new OnQueryCompleteListener() {
             @Override
-            public void onQueryComplete(Cursor c) {
-                ParlayUser user = LaundroDb.getUserManager().getUserFromResult(c);
-                updateProfile(user);
+            public void onQueryComplete(Cursor c, SQLException e) {
+                if (e != null) {
+                    e.printStackTrace();
+                    Snackbar.make(coordinatorLayout, e.getLocalizedMessage(), Snackbar.LENGTH_LONG)
+                            .show();
+                } else {
+                    ParlayUser user = LaundroDb.getUserManager().getUserFromResult(c);
+                    updateProfile(user);
+                }
             }
         });
     }

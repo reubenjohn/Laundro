@@ -375,8 +375,8 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
         }
     }
 
-    public void setPID(String PID) {
-        this.PID = PID;
+    public void setID(String ID) {
+        this.PID = ID;
     }
 
     /**

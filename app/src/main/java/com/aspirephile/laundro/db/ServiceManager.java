@@ -32,7 +32,7 @@ public class ServiceManager extends TableManager {
 
     }
 
-    public LaundroQuery getServiceQuery() {
+    public QueryStatement getServiceQuery() {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(TABLE_NAME);
         String query = qb.buildQuery(new String[]{_ID, COLUMN_NAME_CREATED_AT, COLUMN_NAME_NAME, COLUMN_NAME_LOCATION},
@@ -41,7 +41,7 @@ public class ServiceManager extends TableManager {
                 null,
                 null,
                 null);
-        return new LaundroQuery(dbHelper, query, null);
+        return new QueryStatement(dbHelper, query, null);
     }
 
     @NonNull
