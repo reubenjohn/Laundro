@@ -35,14 +35,6 @@ import com.aspirephile.laundro.db.OnQueryCompleteListener;
 import com.aspirephile.laundro.preferences.SettingsActivity;
 import com.aspirephile.shared.debug.Logger;
 
-import org.kawanfw.sql.api.client.android.AceQLDBManager;
-import org.kawanfw.sql.api.client.android.BackendConnection;
-import org.kawanfw.sql.api.client.android.execute.OnGetPrepareStatement;
-import org.kawanfw.sql.api.client.android.execute.query.OnGetResultSetListener;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -177,25 +169,27 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
 
-            LaundroDb.getUserManager().getIsUserAuthenticatedQuery(email).queryInBackground(new OnQueryCompleteListener() {
-                @Override
-                public void onQueryComplete(Cursor c) {
-                    boolean isAuthenticated = LaundroDb.getUserManager().checkUserAuthenticationResult(c);
-                    showProgress(false);
+            LaundroDb.getUserManager().isUserAuthenticated(email)
+                    .queryInBackground(new OnQueryCompleteListener() {
+                        @SuppressLint("CommitPrefEdits")
+                        @Override
+                        public void onQueryComplete(Cursor c) {
+                            boolean isAuthenticated = LaundroDb.getUserManager().checkUserAuthenticationResult(c);
+                            showProgress(false);
 
-                    if (isAuthenticated) {
-                        SharedPreferences sp = getSharedPreferences(Constants.files.authentication, MODE_PRIVATE);
-                        sp.edit().putString(Constants.preferences.username, email)
+                            if (isAuthenticated) {
+                                SharedPreferences sp = getSharedPreferences(Constants.files.authentication, MODE_PRIVATE);
+                                sp.edit().putString(Constants.preferences.username, email)
 //                                    .putString(Constants.preferences.password, password)
-                                .commit();
-                        setResult(RESULT_OK);
-                        finish();
-                    } else {
-                        mUsernameView.setError(getString(com.aspirephile.laundro.R.string.error_incorrect_username));
-                        mUsernameView.requestFocus();
-                    }
-                }
-            });
+                                        .commit();
+                                setResult(RESULT_OK);
+                                finish();
+                            } else {
+                                mUsernameView.setError(getString(com.aspirephile.laundro.R.string.error_incorrect_username));
+                                mUsernameView.requestFocus();
+                            }
+                        }
+                    });
         }
     }
 

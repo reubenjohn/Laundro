@@ -3,6 +3,7 @@ package com.aspirephile.laundro;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -18,16 +19,6 @@ import android.widget.TextView;
 import com.aspirephile.laundro.db.LaundroDb;
 import com.aspirephile.laundro.db.OnQueryCompleteListener;
 import com.aspirephile.laundro.db.tables.ParlayUser;
-
-import org.kawanfw.sql.api.client.android.AceQLDBManager;
-import org.kawanfw.sql.api.client.android.BackendConnection;
-import org.kawanfw.sql.api.client.android.execute.OnGetPrepareStatement;
-import org.kawanfw.sql.api.client.android.execute.query.OnGetResultSetListener;
-import org.kawanfw.sql.api.client.android.execute.update.OnUpdateCompleteListener;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class UserInfoActivity extends AppCompatActivity implements View.OnClickListener {
     ImageView contactImgImgView;
@@ -72,7 +63,7 @@ public class UserInfoActivity extends AppCompatActivity implements View.OnClickL
         editTextLast = (EditText) findViewById(com.aspirephile.laundro.R.id.editTextLname);
         tUsername = (TextView) findViewById(com.aspirephile.laundro.R.id.textViewUsername);
 
-        LaundroDb.getUserManager().getUserQuery(email).queryInBackground(new OnQueryCompleteListener() {
+        LaundroDb.getUserManager().getUser(email).queryInBackground(new OnQueryCompleteListener() {
             @Override
             public void onQueryComplete(Cursor c) {
                 ParlayUser user = LaundroDb.getUserManager().getUserFromResult(c);
@@ -101,35 +92,20 @@ public class UserInfoActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View v) {
         final String fname = editTextFirst.getText().toString();
         final String lname = editTextLast.getText().toString();
-        OnGetPrepareStatement preparedStatementListener = new OnGetPrepareStatement() {
-            @Override
-            public PreparedStatement onGetPreparedStatement(BackendConnection remoteConnection) {
-                String sql = "update ParlayUser set fname=?,lname=? where email=?";
-                PreparedStatement preparedStatement = null;
-                try {
-                    preparedStatement = remoteConnection.prepareStatement(sql);
-                    preparedStatement.setString(1, fname);
-                    preparedStatement.setString(2, lname);
-                    preparedStatement.setString(3, email);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                return preparedStatement;
-            }
-        };
-        OnUpdateCompleteListener onUpdateCompleteListener = new OnUpdateCompleteListener() {
-            @Override
-            public void onUpdateComplete(int result, SQLException e) {
-                if (e != null) {
-                    e.printStackTrace();
-                    Snackbar.make(coordinatorLayout, e.getLocalizedMessage(), Snackbar.LENGTH_LONG)
-                            .show();
-                } else {
-                    Snackbar.make(coordinatorLayout, com.aspirephile.laundro.R.string.user_info_update_success, Snackbar.LENGTH_LONG)
-                            .show();
-                }
-            }
-        };
-        AceQLDBManager.executeUpdate(preparedStatementListener, onUpdateCompleteListener);
+
+        LaundroDb.getUserManager().updateName(email, fname)
+                .executeInBackground(new com.aspirephile.laundro.db.OnUpdateCompleteListener() {
+                    @Override
+                    public void onUpdateComplete(int cursor, SQLException e) {
+                        if (e != null) {
+                            e.printStackTrace();
+                            Snackbar.make(coordinatorLayout, e.getLocalizedMessage(), Snackbar.LENGTH_LONG)
+                                    .show();
+                        } else {
+                            Snackbar.make(coordinatorLayout, com.aspirephile.laundro.R.string.user_info_update_success, Snackbar.LENGTH_LONG)
+                                    .show();
+                        }
+                    }
+                });
     }
 }

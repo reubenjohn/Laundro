@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.support.annotation.NonNull;
 
-import com.aspirephile.laundro.db.LaundroContract;
 import com.aspirephile.laundro.db.tables.Service;
 
 import java.util.ArrayList;
@@ -17,11 +16,8 @@ import static com.aspirephile.laundro.db.LaundroContract.Service.COLUMN_NAME_LOC
 import static com.aspirephile.laundro.db.LaundroContract.Service.COLUMN_NAME_NAME;
 import static com.aspirephile.laundro.db.LaundroContract.Service.TABLE_NAME;
 
-/**
- * Created by Reuben John on 9/24/2016.
- */
 public class ServiceManager extends TableManager {
-    public ServiceManager(LaundroDb dbHelper) {
+    ServiceManager(LaundroDb dbHelper) {
         super(dbHelper);
     }
 
