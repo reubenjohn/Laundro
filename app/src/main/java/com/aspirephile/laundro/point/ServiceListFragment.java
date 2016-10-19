@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.support.annotation.IntRange;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -63,11 +63,11 @@ public class ServiceListFragment extends Fragment implements SwipeRefreshLayout.
         return fragment;
     }
 
-    public static ServiceListFragment newInstance(int columnCount, @NonNull String PID, char standing) {
+    public static ServiceListFragment newInstance(int columnCount, @IntRange(from = 0) int PID, char standing) {
         ServiceListFragment fragment = new ServiceListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
-        args.putString(ARG_PID, PID);
+        args.putInt(ARG_PID, PID);
         args.putChar(ARG_STANDING, standing);
         fragment.setArguments(args);
         return fragment;
@@ -132,14 +132,14 @@ public class ServiceListFragment extends Fragment implements SwipeRefreshLayout.
         if (swipeRefreshLayout != null)
             swipeRefreshLayout.setRefreshing(true);
 
-        LaundroDb.getServiceManager().getServiceQuery().queryInBackground(new OnQueryCompleteListener() {
+        LaundroDb.getServiceManager().getAllServices().queryInBackground(new OnQueryCompleteListener() {
             @Override
             public void onQueryComplete(Cursor c, SQLException e) {
                 if (e != null) {
                     e.printStackTrace();
                     mListener.onPointListLoadFailed(e);
                 } else {
-                    List<Service> list = LaundroDb.getServiceManager().getServiceFromResult(c);
+                    List<Service> list = LaundroDb.getServiceManager().getServicesFromResult(c);
                     l.i("Point query completed with " + list.size() + " results");
                     if (asserter.assertPointer(recyclerView))
                         recyclerView.setAdapter(new ServiceRecyclerViewAdapter(list, mListener));

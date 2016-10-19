@@ -2,8 +2,10 @@ package com.aspirephile.laundro.point;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -19,23 +21,24 @@ import android.widget.TextView;
 
 import com.aspirephile.laundro.Constants;
 import com.aspirephile.laundro.R;
+import com.aspirephile.laundro.db.LaundroDb;
+import com.aspirephile.laundro.db.OnQueryCompleteListener;
+import com.aspirephile.laundro.db.tables.Service;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
 import org.kawanfw.sql.api.client.android.AceQLDBManager;
 import org.kawanfw.sql.api.client.android.BackendConnection;
 import org.kawanfw.sql.api.client.android.execute.OnGetPrepareStatement;
-import org.kawanfw.sql.api.client.android.execute.query.OnGetResultSetListener;
 import org.kawanfw.sql.api.client.android.execute.update.OnUpdateCompleteListener;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
 public class ServiceViewerFragment extends Fragment implements View.OnClickListener {
 
-    OnFragmentInteractionListener fragmentInteractionListener;
+    private OnFragmentInteractionListener fragmentInteractionListener;
     private Logger l = new Logger(ServiceViewerFragment.class);
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
 
@@ -43,10 +46,9 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private FloatingActionButton editFab;
     private TextView descriptionView;
-    private String PID;
+    private int _id;
     private String username;
-    private ServiceViewerResult serviceViewerResult;
-    private ServiceListFragment forListF, againstListF;
+    private Service service;
     private Button commentB;
     private ImageButton imageButtonLike;
     private ImageButton imageButtonDislike;
@@ -72,6 +74,18 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
+        LaundroDb.getServiceManager().getService(_id).queryInBackground(new OnQueryCompleteListener() {
+            @Override
+            public void onQueryComplete(Cursor c, android.database.SQLException e) {
+                if (e != null) {
+                    fragmentInteractionListener.onFetchFailed(e);
+                } else {
+                    Service service = LaundroDb.getServiceManager().getServiceFromResult(c);
+                    updateViews(service);
+                }
+            }
+        });
+        /*
         OnGetPrepareStatement onGetPreparedStatementListener = new OnGetPrepareStatement() {
             @Override
             public PreparedStatement onGetPreparedStatement(BackendConnection remoteConnection) {
@@ -80,7 +94,7 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
                 PreparedStatement preparedStatement = null;
                 try {
                     preparedStatement = remoteConnection.prepareStatement(sql);
-                    preparedStatement.setString(1, PID);
+                    preparedStatement.setString(1, _id);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -97,8 +111,8 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
                     try {
                         if (rs != null) {
                             rs.next();
-                            serviceViewerResult = new ServiceViewerResult(rs, getContext());
-                            updateViews(serviceViewerResult);
+                            service = new ServiceViewerResult(rs, getContext());
+                            updateViews(service);
                         } else {
                             fragmentInteractionListener.onPointNotFound();
                         }
@@ -118,7 +132,7 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
                 try {
                     preparedStatement = remoteConnection.prepareStatement("Select updown from votespoint where email=? and _id=?");
                     preparedStatement.setString(1, username);
-                    preparedStatement.setString(2, PID);
+                    preparedStatement.setString(2, _id);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -151,6 +165,7 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
             }
         };
         AceQLDBManager.executeQuery(sql, onGetResult);
+        */
     }
 
 
@@ -162,8 +177,8 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
         if (asserter.assertPointer(v))
             bridgeXML(v);
         initializeFields();
-        if (serviceViewerResult != null)
-            updateViews(serviceViewerResult);
+        if (service != null)
+            updateViews(service);
         imageButtonLike = (ImageButton) v.findViewById(R.id.image_button_like);
         imageButtonDislike = (ImageButton) v.findViewById(R.id.image_button_dislike);
         imageButtonDislike.setOnClickListener(this);
@@ -241,18 +256,18 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
 
         commentB.setOnClickListener(this);
 
-        openForListFragment();
-        openAgainstListFragment();
+        //openForListFragment();
+        //openAgainstListFragment();
     }
 
     private void openForListFragment() {
         // find the retained fragment on activity restarts
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        forListF = (ServiceListFragment) fm.findFragmentByTag(Constants.tags.pointListForFragment);
+        ServiceListFragment forListF = (ServiceListFragment) fm.findFragmentByTag(Constants.tags.pointListForFragment);
 
         if (!asserter.assertPointerQuietly(forListF)) {
             l.i("Creating new " + ServiceListFragment.class.getSimpleName() + " fragment");
-            forListF = ServiceListFragment.newInstance(1, PID, 'S');
+            forListF = ServiceListFragment.newInstance(1, _id, 'S');
             fm.beginTransaction()
                     .replace(R.id.container_point_viewer_for, forListF, Constants.tags.pointListForFragment)
                     .commit();
@@ -262,20 +277,21 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
     private void openAgainstListFragment() {
         // find the retained fragment on activity restarts
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        againstListF = (ServiceListFragment) fm.findFragmentByTag(Constants.tags.pointListAgainstFragment);
+        ServiceListFragment againstListF = (ServiceListFragment) fm.findFragmentByTag(Constants.tags.pointListAgainstFragment);
 
         if (!asserter.assertPointerQuietly(againstListF)) {
             l.i("Creating new " + ServiceListFragment.class.getSimpleName() + " fragment");
-            againstListF = ServiceListFragment.newInstance(1, PID, 'O');
+            againstListF = ServiceListFragment.newInstance(1, _id, 'O');
             fm.beginTransaction()
                     .replace(R.id.container_point_viewer_against, againstListF, Constants.tags.pointListAgainstFragment)
                     .commit();
         }
     }
 
-    private void updateViews(ServiceViewerResult point) {
-        collapsingToolbarLayout.setTitle(point.getTitle());
-        descriptionView.setText(point.getDescription());
+    private void updateViews(@NonNull Service service) {
+        this.service = service;
+        collapsingToolbarLayout.setTitle(service.name);
+        //descriptionView.setText(service.getDescription());
         //TODO Fill other fields here
     }
 
@@ -295,7 +311,7 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
                 try {
                     preparedStatement = remoteConnection.prepareStatement("DELETE FROM votespoint where email=? and _id=?");
                     preparedStatement.setString(1, username);
-                    preparedStatement.setString(2, PID);
+                    preparedStatement.setInt(2, _id);
 
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -318,7 +334,7 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
                             try {
                                 preparedStatement = remoteConnection.prepareStatement("INSERT INTO votespoint VALUES(?,?,?,?)");
                                 preparedStatement.setString(1, username);
-                                preparedStatement.setString(2, PID);
+                                preparedStatement.setInt(2, _id);
                                 preparedStatement.setString(3, updown);
                                 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                                 preparedStatement.setTimestamp(4, timestamp);
@@ -364,7 +380,7 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
         } else if (id == R.id.b_point_viewer_comments) {
             l.d("Opening comments");
             Intent i = new Intent(getActivity(), com.aspirephile.laundro.comment.CommentListActivity.class);
-            i.putExtra(Constants.extras._id, PID);
+            i.putExtra(Constants.extras._id, _id);
             startActivity(i);
         } else if (id == R.id.image_button_dislike) {
             performVote("D");
@@ -375,8 +391,8 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
         }
     }
 
-    public void setID(String ID) {
-        this.PID = ID;
+    void setID(int ID) {
+        this._id = ID;
     }
 
     /**
@@ -390,7 +406,7 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        void onFetchFailed(SQLException e);
+        void onFetchFailed(android.database.SQLException e);
 
         void onPointNotFound();
     }

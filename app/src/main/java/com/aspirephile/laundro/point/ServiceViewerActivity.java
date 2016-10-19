@@ -1,6 +1,7 @@
 package com.aspirephile.laundro.point;
 
 import android.content.Intent;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -12,13 +13,11 @@ import com.aspirephile.laundro.R;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
-import java.sql.SQLException;
-
 public class ServiceViewerActivity extends AppCompatActivity implements ServiceViewerFragment.OnFragmentInteractionListener {
 
     private Logger l = new Logger(ServiceViewerActivity.class);
 
-    private String _id;
+    private int _id;
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
 
     @Override
@@ -32,7 +31,7 @@ public class ServiceViewerActivity extends AppCompatActivity implements ServiceV
             data.putExtra(Constants.extras.errorResult, Constants.errorResults.badIntent);
             setResult(RESULT_CANCELED, data);
             return;
-        } else if ((_id = i.getStringExtra(Constants.extras._id)) == null) {
+        } else if ((_id = i.getIntExtra(Constants.extras._id, -1)) == -1) {
             Intent data = new Intent();
             data.putExtra(Constants.extras.errorResult, Constants.errorResults.badPID);
             data.putExtra(Constants.extras._id, _id);
