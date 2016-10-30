@@ -19,7 +19,7 @@
             android:layout_alignParentTop="true"
             android:layout_margin="@dimen/text_margin"
             android:text="@string/sample_comment_description"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -39,19 +39,20 @@
                 android:layout_alignParentTop="true"
                 android:background="@color/material_grey_300"
                 android:text="@string/sample_timestamp"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
 
             <TextView
-                android:id="@+id/tv_item_comment_username"
+                android:id="@+id/tv_item_review_rating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:layout_gravity="center_horizontal"
-                android:text="@string/user_email"
-                android:textAppearance="?attr/textAppearanceListItem"
-                tools:ignore="RelativeOverlap" />
+                android:layout_margin="4dp"
+                android:text="@string/sample_rating"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                tools:ignore="RelativeOverlap"/>
 
         </RelativeLayout>
 

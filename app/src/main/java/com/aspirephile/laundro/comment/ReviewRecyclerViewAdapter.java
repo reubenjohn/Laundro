@@ -9,7 +9,10 @@ import android.widget.TextView;
 import com.aspirephile.laundro.R;
 import com.aspirephile.laundro.db.tables.Review;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link CommentListItem.CommentItem} and makes a call to the
@@ -20,9 +23,12 @@ public class ReviewRecyclerViewAdapter extends RecyclerView.Adapter<ReviewRecycl
     private final List<Review> mValues;
     private final ReviewListFragment.OnListFragmentInteractionListener mListener;
 
+    SimpleDateFormat format;
+
     public ReviewRecyclerViewAdapter(List<Review> items, ReviewListFragment.OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
+        format = new SimpleDateFormat("dd/MM/yyyy hh:mm", Locale.getDefault());
     }
 
     @Override
@@ -36,8 +42,8 @@ public class ReviewRecyclerViewAdapter extends RecyclerView.Adapter<ReviewRecycl
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.descView.setText(mValues.get(position).description);
-        holder.timestampView.setText(String.valueOf(mValues.get(position).timestamp));
-        holder.usernameView.setText(String.valueOf(mValues.get(position).user));
+        holder.timestampView.setText(String.valueOf(format.format(new Date(mValues.get(position).timestamp))));
+        holder.ratingView.setText(String.valueOf(mValues.get(position).rating));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,7 +66,7 @@ public class ReviewRecyclerViewAdapter extends RecyclerView.Adapter<ReviewRecycl
         public final View mView;
         public final TextView descView;
         public final TextView timestampView;
-        public final TextView usernameView;
+        public final TextView ratingView;
         public Review mItem;
 
         public ViewHolder(View view) {
@@ -68,7 +74,7 @@ public class ReviewRecyclerViewAdapter extends RecyclerView.Adapter<ReviewRecycl
             mView = view;
             descView = (TextView) view.findViewById(R.id.tv_item_comment_description);
             timestampView = (TextView) view.findViewById(R.id.tv_item_comment_timestamp);
-            usernameView = (TextView) view.findViewById(R.id.tv_item_comment_username);             //What to do?
+            ratingView = (TextView) view.findViewById(R.id.tv_item_review_rating);             //What to do?
         }
 
     }

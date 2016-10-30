@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.Toast;
 
 import com.aspirephile.laundro.Constants;
@@ -29,6 +30,7 @@ public class ReviewListActivity extends AppCompatActivity implements ReviewListF
     private ReviewListFragment commentListF;
     private EditText description;
     private long userId;
+    private RatingBar ratingBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +51,10 @@ public class ReviewListActivity extends AppCompatActivity implements ReviewListF
             return;
         }
 
-        setContentView(R.layout.activity_comment_list);
+        setContentView(R.layout.activity_review_list);
 
         description = (EditText) findViewById(R.id.et_comment_description);
+        ratingBar = (RatingBar) findViewById(R.id.ratingBar);
 
 
         SharedPreferences sp = getSharedPreferences(Constants.files.authentication, MODE_PRIVATE);
@@ -66,7 +69,7 @@ public class ReviewListActivity extends AppCompatActivity implements ReviewListF
         findViewById(R.id.fab_comment_list).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Review review = new Review(serviceId, ReviewListActivity.this.userId, System.currentTimeMillis(), 3.5f, description.getText().toString());
+                Review review = new Review(serviceId, ReviewListActivity.this.userId, System.currentTimeMillis(), ratingBar.getRating(), description.getText().toString());
                 LaundroDb.getReviewManager().insertReview(review).executeInBackground(new OnInsertCompleteListener() {
                     @Override
                     public void onInsertComplete(long rowId, SQLException e) {
