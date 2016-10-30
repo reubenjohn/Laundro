@@ -132,14 +132,14 @@ public class ServiceListFragment extends Fragment implements SwipeRefreshLayout.
         if (swipeRefreshLayout != null)
             swipeRefreshLayout.setRefreshing(true);
 
-        LaundroDb.getServiceManager().getAllServices().queryInBackground(new OnQueryCompleteListener() {
+        LaundroDb.getServiceManager().getServicesListQuery().queryInBackground(new OnQueryCompleteListener() {
             @Override
             public void onQueryComplete(Cursor c, SQLException e) {
                 if (e != null) {
                     e.printStackTrace();
                     mListener.onPointListLoadFailed(e);
                 } else {
-                    List<Service> list = LaundroDb.getServiceManager().getServicesFromResult(c);
+                    List<Service> list = LaundroDb.getServiceManager().getServiceListFromResult(c);
                     l.i("Point query completed with " + list.size() + " results");
                     if (asserter.assertPointer(recyclerView))
                         recyclerView.setAdapter(new ServiceRecyclerViewAdapter(list, mListener));

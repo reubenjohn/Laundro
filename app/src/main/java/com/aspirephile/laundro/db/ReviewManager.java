@@ -100,4 +100,24 @@ public class ReviewManager extends TableManager {
         ContentValues values = review.getContentValues();
         return new InsertStatement(dbHelper, TABLE_NAME, values);
     }
+
+    public QueryStatement getAverageReview(long serviceId) {
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        qb.setTables(TABLE_NAME);
+        String query = qb.buildQuery(new String[]{"avg(" + RATING + ")"},
+                SERVICE + "=?",
+                null,
+                null,
+                null,
+                null);
+        return new QueryStatement(dbHelper, query, new String[]{String.valueOf(serviceId)});
+    }
+
+    public float getAverageRatingFromCursor(Cursor c) {
+        c.moveToFirst();
+        if (c.getCount() > 0)
+            return c.getFloat(0);
+        else
+            return 0.0f;
+    }
 }

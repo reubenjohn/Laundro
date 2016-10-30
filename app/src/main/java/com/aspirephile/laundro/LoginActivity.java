@@ -33,6 +33,7 @@ import android.widget.Button;
 
 import com.aspirephile.laundro.db.LaundroDb;
 import com.aspirephile.laundro.db.OnQueryCompleteListener;
+import com.aspirephile.laundro.db.tables.User;
 import com.aspirephile.laundro.preferences.SettingsActivity;
 import com.aspirephile.shared.debug.Logger;
 
@@ -170,7 +171,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
 
-            LaundroDb.getUserManager().isUserAuthenticated(email)
+            LaundroDb.getUserManager().getUser(email)
                     .queryInBackground(new OnQueryCompleteListener() {
                         @SuppressLint("CommitPrefEdits")
                         @Override
@@ -180,17 +181,22 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                 mUsernameView.setError(getString(com.aspirephile.laundro.R.string.error_authentication_unknown));
                                 mUsernameView.requestFocus();
                             } else {
-                                boolean isAuthenticated = LaundroDb.getUserManager().checkUserAuthenticationResult(c);
-                                showProgress(false);
-
-                                if (isAuthenticated) {
-                                    SharedPreferences sp = getSharedPreferences(Constants.files.authentication, MODE_PRIVATE);
-                                    sp.edit().putString(Constants.preferences.username, email)
-//                                    .putString(Constants.preferences.password, password)
-                                            .commit();
-                                    setResult(RESULT_OK);
-                                    finish();
-                                } else {
+                                try {
+                                    showProgress(false);
+                                    User user = LaundroDb.getUserManager().getUserFromResult(c);
+                                    if (user != null) {
+                                        SharedPreferences sp = getSharedPreferences(Constants.files.authentication, MODE_PRIVATE);
+                                        sp.edit().putString(Constants.preferences.username, email)
+                                                .putLong(Constants.preferences.userId, user._id)
+                                                .commit();
+                                        setResult(RESULT_OK);
+                                        finish();
+                                    } else {
+                                        mUsernameView.setError(getString(com.aspirephile.laundro.R.string.error_incorrect_username));
+                                        mUsernameView.requestFocus();
+                                    }
+                                } catch (Exception e1) {
+                                    e1.printStackTrace();
                                     mUsernameView.setError(getString(com.aspirephile.laundro.R.string.error_incorrect_username));
                                     mUsernameView.requestFocus();
                                 }

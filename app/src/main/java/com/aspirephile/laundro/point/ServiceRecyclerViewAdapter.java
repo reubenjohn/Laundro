@@ -37,8 +37,11 @@ class ServiceRecyclerViewAdapter extends RecyclerView.Adapter<ServiceRecyclerVie
         holder.mItem = mValues.get(position);
         holder.nameView.setText(holder.mItem.name);
         Date createdAt = new Date(holder.mItem.createdAt);
+        String locationName = holder.mItem.location.name;
+        if (locationName.length() > 20)
+            locationName = locationName.substring(0, 20) + "...";
         holder.createdAtView.setText(DateFormat.getDateInstance().format(createdAt));
-        holder.locationView.setText(holder.mItem.location);
+        holder.locationView.setText(locationName);
         //holder.ratingView.setProgress(mValues.get(position).rating);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {

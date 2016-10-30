@@ -3,7 +3,6 @@ package com.aspirephile.laundro.comment;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.SQLException;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -18,9 +17,7 @@ import com.aspirephile.laundro.Constants;
 import com.aspirephile.laundro.R;
 import com.aspirephile.laundro.db.LaundroDb;
 import com.aspirephile.laundro.db.OnInsertCompleteListener;
-import com.aspirephile.laundro.db.OnQueryCompleteListener;
 import com.aspirephile.laundro.db.tables.Review;
-import com.aspirephile.laundro.db.tables.User;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
@@ -58,32 +55,18 @@ public class ReviewListActivity extends AppCompatActivity implements ReviewListF
 
 
         SharedPreferences sp = getSharedPreferences(Constants.files.authentication, MODE_PRIVATE);
-        String username = sp.getString(Constants.preferences.username, null);
-        if (username == null) {
+        userId = sp.getLong(Constants.preferences.userId, -1);
+        if (userId == -1) {
             Intent data = new Intent();
             data.putExtra(Constants.extras.errorResult, Constants.errorResults.badUsername);
             setResult(RESULT_CANCELED, data);
             return;
         }
 
-        l.d("Querying for user with username: " + username);
-        LaundroDb.getUserManager().getUser(username).queryInBackground(new OnQueryCompleteListener() {
-            @Override
-            public void onQueryComplete(Cursor c, SQLException e) {
-                if (e != null) {
-                    onCommentListLoadFailed(e);
-                } else {
-                    User user = LaundroDb.getUserManager().getUserFromResult(c);
-                    userId = user._id;
-                    l.i("Retrieved userId: " + userId);
-                }
-            }
-        });
-
         findViewById(R.id.fab_comment_list).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Review review = new Review(serviceId, userId, System.currentTimeMillis(), 3.5f, description.getText().toString());
+                Review review = new Review(serviceId, ReviewListActivity.this.userId, System.currentTimeMillis(), 3.5f, description.getText().toString());
                 LaundroDb.getReviewManager().insertReview(review).executeInBackground(new OnInsertCompleteListener() {
                     @Override
                     public void onInsertComplete(long rowId, SQLException e) {

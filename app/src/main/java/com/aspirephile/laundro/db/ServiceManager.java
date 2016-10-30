@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.support.annotation.NonNull;
 
+import com.aspirephile.laundro.db.tables.Location;
 import com.aspirephile.laundro.db.tables.Service;
 
 import java.util.ArrayList;
@@ -34,10 +35,17 @@ public class ServiceManager extends TableManager {
 
     }
 
-    public QueryStatement getAllServices() {
+    public QueryStatement getServicesListQuery() {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(TABLE_NAME);
-        String query = qb.buildQuery(new String[]{_ID, NAME, CREATED_AT, LOCATION, PHONE, DESCRIPTION},
+        String query = qb.buildQuery(new String[]{
+                        _ID,
+                        NAME,
+                        CREATED_AT,
+                        LOCATION,
+                        "(select " + LaundroContract.Location.NAME + " from " + LaundroContract.Location.TABLE_NAME + " where " + LaundroContract.Location.TABLE_NAME + "." + LaundroContract.Location._ID + " = " + TABLE_NAME + "." + LOCATION + ")",
+                        PHONE,
+                        DESCRIPTION},
                 null,
                 null,
                 null,
@@ -47,11 +55,19 @@ public class ServiceManager extends TableManager {
     }
 
     @NonNull
-    public List<Service> getServicesFromResult(@NonNull Cursor c) {
+    public List<Service> getServiceListFromResult(@NonNull Cursor c) {
         ArrayList<Service> list = new ArrayList<>();
         try {
             while (c.moveToNext()) {
-                Service service = new Service(c);
+                Service service = new Service();
+                service._id = c.getInt(0);
+                service.name = c.getString(1);
+                service.createdAt = c.getLong(2);
+                service.location = new Location();
+                service.location._id = c.getLong(3);
+                service.location.name = c.getString(4);
+                service.phone = c.getString(5);
+                service.description = c.getString(6);
                 list.add(service);
             }
         } finally {
@@ -63,7 +79,14 @@ public class ServiceManager extends TableManager {
     public QueryStatement getService(long _id) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(TABLE_NAME);
-        String query = qb.buildQuery(new String[]{_ID, NAME, CREATED_AT, LOCATION, PHONE, DESCRIPTION},
+        String query = qb.buildQuery(new String[]{
+                        _ID,
+                        NAME,
+                        CREATED_AT,
+                        LOCATION,
+                        "(select " + LaundroContract.Location.NAME + " from " + LaundroContract.Location.TABLE_NAME + " where " + LaundroContract.Location.TABLE_NAME + "." + LaundroContract.Location._ID + " = " + TABLE_NAME + "." + LOCATION + ")",
+                        PHONE,
+                        DESCRIPTION},
                 LaundroContract.Service._ID + "=?",
                 null,
                 null,
@@ -73,7 +96,7 @@ public class ServiceManager extends TableManager {
     }
 
     public Service getServiceFromResult(@NonNull Cursor c) {
-        List<Service> services = getServicesFromResult(c);
+        List<Service> services = getServiceListFromResult(c);
         if (services.size() > 0)
             return services.get(0);
         else

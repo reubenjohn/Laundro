@@ -21,7 +21,7 @@ public class InsertStatement {
 
     public long execute() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        l.d("Executing update statement");
+        l.d("Executing insertion into table " + tableName + " with contentValues: " + values);
         long rowId = db.insert(tableName, nullColumnHack, values);
         l.d("Update statement affected " + rowId + " rows");
         return rowId;

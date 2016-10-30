@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -25,9 +26,8 @@ import com.aspirephile.laundro.R;
 import com.aspirephile.laundro.comment.ReviewListActivity;
 import com.aspirephile.laundro.db.LaundroDb;
 import com.aspirephile.laundro.db.OnQueryCompleteListener;
-import com.aspirephile.laundro.db.tables.Review;
+import com.aspirephile.laundro.db.tables.Location;
 import com.aspirephile.laundro.db.tables.Service;
-import com.aspirephile.laundro.db.tables.User;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
@@ -42,12 +42,14 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
     private FloatingActionButton editFab;
     private TextView descriptionView;
     private long _id;
-    private String username;
+    private long userId;
     private Service service;
     private Button reviewB;
-    private Review review;
+    private float rating = 0.0f;
     private RatingBar ratingBar;
     private TextView phoneView;
+    private TextView locationView;
+    private Location location;
 
     public ServiceViewerFragment() {
         l.onConstructor();
@@ -71,7 +73,10 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
         setRetainInstance(true);
 
         SharedPreferences sp = getActivity().getSharedPreferences(Constants.files.authentication, Activity.MODE_PRIVATE);
-        username = sp.getString(Constants.preferences.username, null);
+        userId = sp.getLong(Constants.preferences.userId, -1);
+        if (userId == -1) {
+            fragmentInteractionListener.onFetchFailed(new SQLException("userId not found in shared preferences"));
+        }
 
         LaundroDb.getServiceManager().getService(_id).queryInBackground(new OnQueryCompleteListener() {
             @Override
@@ -80,21 +85,21 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
                     fragmentInteractionListener.onFetchFailed(e);
                 } else {
                     final Service service = LaundroDb.getServiceManager().getServiceFromResult(c);
-                    LaundroDb.getUserManager().getUser(username).queryInBackground(new OnQueryCompleteListener() {
+                    LaundroDb.getLocationManager().getLocation(service.location._id).queryInBackground(new OnQueryCompleteListener() {
                         @Override
                         public void onQueryComplete(Cursor c, SQLException e) {
                             if (e != null) {
                                 fragmentInteractionListener.onFetchFailed(e);
                             } else {
-                                User user = LaundroDb.getUserManager().getUserFromResult(c);
-                                LaundroDb.getReviewManager().getAllReviews(service._id, user._id).queryInBackground(new OnQueryCompleteListener() {
+                                final Location location = LaundroDb.getLocationManager().getLocationFromCursor(c);
+                                LaundroDb.getReviewManager().getAverageReview(service._id).queryInBackground(new OnQueryCompleteListener() {
                                     @Override
                                     public void onQueryComplete(Cursor c, android.database.SQLException e) {
                                         if (e != null) {
                                             fragmentInteractionListener.onFetchFailed(e);
                                         } else {
-                                            Review review = LaundroDb.getReviewManager().getRowFromResult(c);
-                                            updateViews(service, review);
+                                            float rating = LaundroDb.getReviewManager().getAverageRatingFromCursor(c);
+                                            updateViews(service, location, rating);
                                         }
                                     }
                                 });
@@ -115,8 +120,8 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
         if (asserter.assertPointer(v))
             bridgeXML(v);
         initializeFields();
-        if (service != null && review != null)
-            updateViews(service, review);
+        if (service != null && location != null)
+            updateViews(service, location, rating);
         return v;
     }
 
@@ -181,7 +186,9 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
 
         phoneView = (TextView) v.findViewById(R.id.tv_phone);
 
-        l.bridgeXML(asserter.assertPointer(coordinatorLayout, collapsingToolbarLayout, descriptionView, editFab, ratingBar, phoneView));
+        locationView = (TextView) v.findViewById(R.id.tv_location);
+
+        l.bridgeXML(asserter.assertPointer(coordinatorLayout, collapsingToolbarLayout, descriptionView, editFab, ratingBar, phoneView, locationView));
     }
 
     private void initializeFields() {
@@ -195,16 +202,43 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
         });
 
         reviewB.setOnClickListener(this);
-        ratingBar.setOnClickListener(this);
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                if (fromUser)
+                    openReviews(_id);
+            }
+        });
     }
 
-    private void updateViews(@NonNull Service service, @NonNull Review review) {
+    private void updateViews(@NonNull final Service service, @NonNull final Location location, float rating) {
         this.service = service;
-        this.review = review;
+        this.location = location;
+        this.rating = rating;
         collapsingToolbarLayout.setTitle(service.name);
-        ratingBar.setRating(review.rating);
+        ratingBar.setRating(rating);
         phoneView.setText(service.phone);
+        locationView.setText(location.name);
         descriptionView.setText(service.description);
+        phoneView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:" + service.phone));
+                startActivity(intent);
+            }
+        });
+        locationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + location.lon + "," + location.lat + "(" + Uri.encode(location.name) + ")");
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                if (mapIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(mapIntent);
+                }
+            }
+        });
         //TODO Fill other fields here
     }
 
@@ -220,12 +254,16 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
             editPoint();
         } else if (id == R.id.b_point_viewer_reviews || id == R.id.cv_review || id == R.id.service_rating) {
             l.d("Opening reviews for id: " + _id);
-            Intent i = new Intent(getActivity(), ReviewListActivity.class);
-            i.putExtra(Constants.extras._id, _id);
-            startActivity(i);
+            openReviews(_id);
         } else {
             l.w("Unhandled view clicked with ID: " + v.getId());
         }
+    }
+
+    private void openReviews(long serviceId) {
+        Intent i = new Intent(getActivity(), ReviewListActivity.class);
+        i.putExtra(Constants.extras._id, serviceId);
+        startActivity(i);
     }
 
     void setID(int ID) {

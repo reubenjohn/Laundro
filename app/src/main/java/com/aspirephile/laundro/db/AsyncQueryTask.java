@@ -27,7 +27,8 @@ class AsyncQueryTask extends AsyncTask<QueryStatement, Void, Cursor> {
     @Override
     protected void onPostExecute(Cursor cursor) {
         super.onPostExecute(cursor);
-        Log.d("AsyncQueryTask", "Retrieved " + cursor.getCount() + " rows, with " + cursor.getColumnCount() + " columns");
+        if (cursor != null)
+            Log.d("AsyncQueryTask", "Retrieved " + cursor.getCount() + " rows, with " + cursor.getColumnCount() + " columns");
         onQueryCompleteListener.onQueryComplete(cursor, e);
     }
 }

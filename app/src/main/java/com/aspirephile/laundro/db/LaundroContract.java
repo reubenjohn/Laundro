@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 public final class LaundroContract {
     private static final String INTEGER_TYPE = "INTEGER";
     private static final String TEXT_TYPE = "TEXT";
+    private static final String NUMBER_TYPE = "NUMBER";
     private static final String COMMA_SEP = ", ";
     private static final String NOT_NULL = "NOT NULL";
     private static final String UNIQUE = "UNIQUE";
@@ -82,8 +83,8 @@ public final class LaundroContract {
                 COLUMNS(
                         COLUMN(_ID, INTEGER_TYPE, NOT_NULL, UNIQUE),
                         COLUMN(NAME, TEXT_TYPE, NOT_NULL, UNIQUE),
-                        COLUMN(LAT, INTEGER_TYPE, NOT_NULL),
-                        COLUMN(LON, INTEGER_TYPE, NOT_NULL)
+                        COLUMN(LAT, NUMBER_TYPE, NOT_NULL),
+                        COLUMN(LON, NUMBER_TYPE, NOT_NULL)
                 ),
                 PRIMARY_KEY(_ID), null);
         public static final String SQL_DELETE_ENTRIES = DROP_TABLE(TABLE_NAME);

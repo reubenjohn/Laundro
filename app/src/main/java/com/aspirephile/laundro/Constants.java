@@ -31,6 +31,7 @@ public class Constants {
 
         public static final String username = "email";
         public static final String url = "url";
+        public static final String userId = "userId";
 
         public static final class pointCreator {
 

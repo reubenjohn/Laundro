@@ -7,6 +7,7 @@ import static com.aspirephile.laundro.db.LaundroContract.Review.DESCRIPTION;
 import static com.aspirephile.laundro.db.LaundroContract.Review.RATING;
 import static com.aspirephile.laundro.db.LaundroContract.Review.SERVICE;
 import static com.aspirephile.laundro.db.LaundroContract.Review.TIMESTAMP;
+import static com.aspirephile.laundro.db.LaundroContract.Review.USER;
 import static com.aspirephile.laundro.db.LaundroContract.Review._ID;
 
 /**
@@ -19,12 +20,16 @@ public class Review {
     public final long _id;
 
     public Review(long service, long user, long timestamp, float rating, String description) {
+        this(-1, service, user, timestamp, rating, description);
+    }
+
+    public Review(long id, long service, long user, long timestamp, float rating, String description) {
+        this._id = id;
         this.user = user;
         this.service = service;
         this.timestamp = timestamp;
         this.rating = rating;
         this.description = description;
-        _id = -1;
     }
 
     public Review(Cursor c) {
@@ -38,7 +43,9 @@ public class Review {
 
     public ContentValues getContentValues() {
         ContentValues values = new ContentValues();
-        values.put(_ID, _id);
+        if (_id != -1)
+            values.put(_ID, _id);
+        values.put(USER, user);
         values.put(SERVICE, service);
         values.put(TIMESTAMP, timestamp);
         values.put(RATING, rating);
