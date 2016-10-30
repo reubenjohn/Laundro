@@ -91,7 +91,7 @@ public class ServiceListFragment extends Fragment implements SwipeRefreshLayout.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_point_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_service_list, container, false);
 
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.srl_point_list);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -137,7 +137,7 @@ public class ServiceListFragment extends Fragment implements SwipeRefreshLayout.
             public void onQueryComplete(Cursor c, SQLException e) {
                 if (e != null) {
                     e.printStackTrace();
-                    mListener.onPointListLoadFailed(e);
+                    mListener.onListLoadFailed(e);
                 } else {
                     List<Service> list = LaundroDb.getServiceManager().getServiceListFromResult(c);
                     l.i("Point query completed with " + list.size() + " results");
@@ -170,8 +170,8 @@ public class ServiceListFragment extends Fragment implements SwipeRefreshLayout.
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        void onPointListItemSelected(Service item);
+        void onListItemSelected(Service item);
 
-        void onPointListLoadFailed(SQLException e);
+        void onListLoadFailed(SQLException e);
     }
 }

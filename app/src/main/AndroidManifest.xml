@@ -46,6 +46,10 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
+            android:name=".bill.BillViewerActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
             android:name=".review.ReviewListActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"/>
@@ -78,6 +82,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".bill.BillListActivity"
+            android:label="@string/title_activity_bill_list"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <receiver android:name=".bill.BillCompletionNotificationPublisher"/>
     </application>
 
 </manifest>

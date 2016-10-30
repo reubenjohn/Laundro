@@ -1,4 +1,4 @@
-package com.aspirephile.laundro.service;
+package com.aspirephile.laundro.bill;
 
 import android.content.Intent;
 import android.database.SQLException;
@@ -10,13 +10,14 @@ import android.view.MenuItem;
 
 import com.aspirephile.laundro.Constants;
 import com.aspirephile.laundro.R;
-import com.aspirephile.laundro.db.tables.OfferedItemType;
+import com.aspirephile.laundro.db.tables.Item;
+import com.aspirephile.laundro.service.ServiceViewerFragment;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
-public class ServiceViewerActivity extends AppCompatActivity implements ServiceViewerFragment.OnFragmentInteractionListener, ServiceViewerFragment.OnOfferedItemTypeFragmentInteractionListener {
+public class BillViewerActivity extends AppCompatActivity implements BillViewerFragment.OnFragmentInteractionListener, BillViewerFragment.OnItemFragmentInteractionListener {
 
-    private Logger l = new Logger(ServiceViewerActivity.class);
+    private Logger l = new Logger(BillViewerActivity.class);
 
     private long _id;
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
@@ -42,18 +43,18 @@ public class ServiceViewerActivity extends AppCompatActivity implements ServiceV
 
         setContentView(R.layout.activity_point_viewer);
 
-        openPointViewerFragment();
+        openBillViewerFragment();
     }
 
 
-    private void openPointViewerFragment() {
+    private void openBillViewerFragment() {
         // find the retained fragment on activity restarts
         FragmentManager fm = getSupportFragmentManager();
-        ServiceViewerFragment serviceViewerF = (ServiceViewerFragment) fm.findFragmentByTag(Constants.tags.pointViewerFragment);
+        BillViewerFragment serviceViewerF = (BillViewerFragment) fm.findFragmentByTag(Constants.tags.billViewerFragment);
 
         if (!asserter.assertPointerQuietly(serviceViewerF)) {
             l.i("Creating new " + ServiceViewerFragment.class.getSimpleName() + " fragment");
-            serviceViewerF = new ServiceViewerFragment();
+            serviceViewerF = new BillViewerFragment();
             fm.beginTransaction()
                     .replace(R.id.container_point_viewer, serviceViewerF, Constants.tags.pointViewerFragment)
                     .commit();
@@ -91,7 +92,7 @@ public class ServiceViewerActivity extends AppCompatActivity implements ServiceV
     }
 
     @Override
-    public void onOfferedItemTypeListItemSelected(OfferedItemType mItem) {
-        l.d("Offered item type selected: " + mItem);
+    public void onListItemSelected(Item mItem) {
+
     }
 }

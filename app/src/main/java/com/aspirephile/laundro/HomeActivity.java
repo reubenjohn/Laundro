@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.aspirephile.laundro.bill.BillListActivity;
 import com.aspirephile.laundro.db.tables.Service;
 import com.aspirephile.laundro.preferences.SettingsActivity;
 import com.aspirephile.laundro.service.ServiceCreatorActivity;
@@ -76,7 +77,7 @@ public class HomeActivity extends AppCompatActivity
             }
         });
 
-        openPointListFragment();
+        openListFragment();
     }
 
     @Override
@@ -98,7 +99,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
 
-    private void openPointListFragment() {
+    private void openListFragment() {
         // find the retained fragment on activity restarts
         FragmentManager fm = getSupportFragmentManager();
         pointListF = (ServiceListFragment) fm.findFragmentByTag(Constants.tags.pointListFragment);
@@ -163,6 +164,9 @@ public class HomeActivity extends AppCompatActivity
 
         if (id == R.id.nav_service_list) {
 
+        } else if (id == R.id.nav_bills) {
+            Intent intent = new Intent(HomeActivity.this, BillListActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_manage) {
             Intent intent = new Intent(HomeActivity.this, SettingsActivity.class);
             startActivity(intent);
@@ -178,7 +182,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onPointListItemSelected(Service item) {
+    public void onListItemSelected(Service item) {
         //TODO Open the right point here
         Intent i = new Intent(HomeActivity.this, ServiceViewerActivity.class);
         i.putExtra(Constants.extras._id, item._id);
@@ -186,7 +190,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onPointListLoadFailed(SQLException e) {
+    public void onListLoadFailed(SQLException e) {
         Snackbar.make(coordinatorLayout, R.string.point_list_fetch_failed, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.retry, new View.OnClickListener() {
                     @Override

@@ -15,5 +15,4 @@ public abstract class TableManager {
     public abstract void onCreate(SQLiteDatabase db);
 
     public abstract void onDestroy(SQLiteDatabase db);
-
 }

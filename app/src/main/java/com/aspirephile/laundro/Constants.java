@@ -61,8 +61,7 @@ public class Constants {
         public static final String pointListFragment = "pointListFragment";
         public static final String pointViewerFragment = "pointViewerFragment";
         public static final String splashFragment = "splashFragment";
-        public static final String pointListForFragment = "pointListForFragment";
-        public static final String pointListAgainstFragment = "pointListAgainstFragment";
         public static final String commentListFragment = "commentListFragment";
+        public static final String billViewerFragment = "billViewerFragment";
     }
 }

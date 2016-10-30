@@ -7,6 +7,10 @@
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/service_list"/>
         <item
+            android:id="@+id/nav_bills"
+            android:icon="@drawable/receipt"
+            android:title="@string/bills"/>
+        <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
             android:title="Tools"/>

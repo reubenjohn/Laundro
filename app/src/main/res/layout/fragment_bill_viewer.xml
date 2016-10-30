@@ -94,7 +94,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_margin="4dp"
-                                    android:text="@string/contact"
+                                    android:text="@string/service"
                                     android:textColor="@color/colorPrimary"/>
 
                                 <TextView
@@ -112,76 +112,15 @@
                                 android:layout_alignParentEnd="true"
                                 android:layout_alignParentRight="true"
                                 android:layout_centerVertical="true"
-                                android:src="@drawable/common_full_open_on_phone"
+                                android:layout_margin="8dp"
+                                android:src="@drawable/washing_machine"
                                 android:tint="@color/cardview_dark_background"/>
                         </RelativeLayout>
                     </android.support.v7.widget.CardView>
 
-                    <android.support.v7.widget.CardView
-                        android:id="@+id/cv_location"
-                        xmlns:android="http://schemas.android.com/apk/res/android"
-                        xmlns:app="http://schemas.android.com/apk/res-auto"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="4dp"
-                        android:clickable="true"
-                        android:foreground="?android:attr/selectableItemBackground"
-                        app:cardCornerRadius="4dp"
-                        app:cardElevation="1dp">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_margin="4dp"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    style="@style/Base.TextAppearance.AppCompat.Medium"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_margin="4dp"
-                                    android:text="@string/location"
-                                    android:textColor="@color/colorPrimary"/>
-
-                                <TextView
-                                    android:id="@+id/tv_location"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_margin="4dp"
-                                    android:text="@string/not_specified"/>
-
-                            </LinearLayout>
-
-                            <ImageView
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
-                                android:layout_alignParentEnd="true"
-                                android:layout_alignParentRight="true"
-                                android:layout_centerVertical="true"
-                                android:src="@drawable/map_pin"
-                                android:tint="@color/cardview_dark_background"/>
-                        </RelativeLayout>
-                    </android.support.v7.widget.CardView>
                 </LinearLayout>
 
 
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp">
-
-                <TextView
-                    android:id="@+id/tv_point_viewer_description"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/text_margin"
-                    android:text="@string/loading"/>
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
@@ -200,65 +139,108 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
-                        android:text="@string/cost_chart"
+                        android:text="@string/items"
                         android:textAppearance="?android:attr/textAppearanceLarge"
                         android:textColor="@color/colorPrimary"/>
+
+                    <android.support.v7.widget.CardView android:id="@+id/vc_item_service"
+                                                        xmlns:android="http://schemas.android.com/apk/res/android"
+                                                        xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                        android:layout_width="match_parent"
+                                                        android:layout_height="wrap_content"
+                                                        android:layout_margin="4dp"
+                                                        app:cardCornerRadius="4dp"
+                                                        app:cardElevation="2dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/text_margin"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/tv_item_name"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1.5"
+                                android:gravity="center"
+                                android:text="Item Type"
+                                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                            <TextView
+                                android:id="@+id/tv_item_cost"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Cost"
+                                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                            <TextView
+                                android:id="@+id/tv_item_count"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Count"
+                                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                            <TextView
+                                android:id="@+id/tv_item_sum"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Sum"
+                                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                        </LinearLayout>
+                    </android.support.v7.widget.CardView>
 
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/cost_chart"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:listitem="@layout/list_item_offered_item_type">
+                        tools:listitem="@layout/list_item_item">
 
                     </android.support.v7.widget.RecyclerView>
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
-                android:id="@+id/cv_review"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:clickable="true"
-                android:foreground="?android:attr/selectableItemBackground">
+                android:layout_margin="8dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="16dp"
                     android:orientation="vertical">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
-                        android:text="@string/reviews"
-                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/sum_total"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
                         android:textColor="@color/colorPrimary"/>
 
-                    <RatingBar
-                        android:id="@+id/service_rating"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:clickable="false"/>
 
                     <TextView
-                        android:id="@+id/b_point_viewer_reviews"
+                        android:id="@+id/tv_sum_total"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:gravity="center"
-                        android:text="@string/show_reviews"
-                        android:textAllCaps="true"
-                        android:textColor="@color/colorPrimary"/>
+                        android:layout_margin="8dp"
+                        android:text="@string/sample_sum_total"/>
 
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 
-
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>
-
 </android.support.design.widget.CoordinatorLayout>

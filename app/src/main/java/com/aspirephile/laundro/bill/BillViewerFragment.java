@@ -1,4 +1,4 @@
-package com.aspirephile.laundro.service;
+package com.aspirephile.laundro.bill;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -19,50 +18,43 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.aspirephile.laundro.Constants;
 import com.aspirephile.laundro.R;
 import com.aspirephile.laundro.db.OnQueryCompleteListener;
-import com.aspirephile.laundro.db.tables.Location;
-import com.aspirephile.laundro.db.tables.OfferedItemType;
-import com.aspirephile.laundro.db.tables.Service;
+import com.aspirephile.laundro.db.tables.Bill;
+import com.aspirephile.laundro.db.tables.Item;
 import com.aspirephile.laundro.review.ReviewListActivity;
+import com.aspirephile.laundro.service.ServiceViewerActivity;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
 import java.util.List;
 
-import static com.aspirephile.laundro.db.LaundroDb.getLocationManager;
-import static com.aspirephile.laundro.db.LaundroDb.getOfferedItemTypeManagerManager;
-import static com.aspirephile.laundro.db.LaundroDb.getReviewManager;
-import static com.aspirephile.laundro.db.LaundroDb.getServiceManager;
+import static com.aspirephile.laundro.db.LaundroDb.getBillManager;
+import static com.aspirephile.laundro.db.LaundroDb.getItemManager;
 
-public class ServiceViewerFragment extends Fragment implements View.OnClickListener {
+public class BillViewerFragment extends Fragment implements View.OnClickListener {
 
     private OnFragmentInteractionListener fragmentInteractionListener;
-    private Logger l = new Logger(ServiceViewerFragment.class);
+    private Logger l = new Logger(BillViewerFragment.class);
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
 
     private CoordinatorLayout coordinatorLayout;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private FloatingActionButton editFab;
-    private TextView descriptionView;
     private long _id;
     private long userId;
-    private Service service;
-    private float rating = 0.0f;
-    private RatingBar ratingBar;
-    private View contactView, locationView;
-    private TextView phoneView;
-    private TextView locationTextView;
-    private Location location;
-    private List<OfferedItemType> costChart;
-    private RecyclerView costChartView;
-    private OnOfferedItemTypeFragmentInteractionListener mListener;
+    private Bill bill;
+    private View serviceView;
+    private TextView serviceNameView;
+    private List<Item> items;
+    private RecyclerView itemsView;
+    private OnItemFragmentInteractionListener mListener;
+    private TextView sumTotalView;
 
-    public ServiceViewerFragment() {
+    public BillViewerFragment() {
         l.onConstructor();
     }
 
@@ -71,8 +63,8 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
         l.onAttach();
         super.onAttach(context);
 
-        if (context instanceof ServiceViewerFragment.OnOfferedItemTypeFragmentInteractionListener) {
-            mListener = (ServiceViewerFragment.OnOfferedItemTypeFragmentInteractionListener) context;
+        if (context instanceof OnItemFragmentInteractionListener) {
+            mListener = (OnItemFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement listener");
@@ -98,41 +90,21 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
             fragmentInteractionListener.onFetchFailed(new SQLException("userId not found in shared preferences"));
         }
 
-        getServiceManager().getService(_id).queryInBackground(new OnQueryCompleteListener() {
+        getBillManager().getBill(_id).queryInBackground(new OnQueryCompleteListener() {
             @Override
-            public void onQueryComplete(Cursor c, android.database.SQLException e) {
+            public void onQueryComplete(Cursor c, SQLException e) {
                 if (e != null) {
                     fragmentInteractionListener.onFetchFailed(e);
                 } else {
-                    service = getServiceManager().getServiceFromResult(c);
-                    getLocationManager().getLocation(service.location._id).queryInBackground(new OnQueryCompleteListener() {
+                    bill = getBillManager().getBillFromResult(c);
+                    getItemManager().getItemQuery(_id).queryInBackground(new OnQueryCompleteListener() {
                         @Override
                         public void onQueryComplete(Cursor c, SQLException e) {
                             if (e != null) {
                                 fragmentInteractionListener.onFetchFailed(e);
                             } else {
-                                location = getLocationManager().getLocationFromCursor(c);
-                                getReviewManager().getAverageReview(service._id).queryInBackground(new OnQueryCompleteListener() {
-                                    @Override
-                                    public void onQueryComplete(Cursor c, android.database.SQLException e) {
-                                        if (e != null) {
-                                            fragmentInteractionListener.onFetchFailed(e);
-                                        } else {
-                                            rating = getReviewManager().getAverageRatingFromCursor(c);
-                                            getOfferedItemTypeManagerManager().getOfferedItemTypeQuery(_id).queryInBackground(new OnQueryCompleteListener() {
-                                                @Override
-                                                public void onQueryComplete(Cursor c, SQLException e) {
-                                                    if (e != null) {
-                                                        fragmentInteractionListener.onFetchFailed(e);
-                                                    } else {
-                                                        costChart = getOfferedItemTypeManagerManager().getOfferedItemTypeListFromCursor(c);
-                                                        updateViews(service, location, rating, costChart);
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    }
-                                });
+                                items = getItemManager().getItemListFromCursor(c);
+                                updateViews(bill, items);
                             }
                         }
                     });
@@ -146,12 +118,10 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         l.onCreateView();
-        View v = inflater.inflate(R.layout.fragment_service_viewer, container, false);
+        View v = inflater.inflate(R.layout.fragment_bill_viewer, container, false);
 
         coordinatorLayout = (CoordinatorLayout) v.findViewById(R.id.cl_point_viewer);
         collapsingToolbarLayout = (CollapsingToolbarLayout) v.findViewById(R.id.ctl_point_viewer);
-
-        descriptionView = (TextView) v.findViewById(R.id.tv_point_viewer_description);
 
         editFab = (FloatingActionButton) v.findViewById(R.id.fab_point_viewer_edit);
         editFab.setOnClickListener(new View.OnClickListener() {
@@ -161,27 +131,18 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
             }
         });
 
-        (v.findViewById(R.id.cv_review)).setOnClickListener(this);
-        ratingBar = (RatingBar) v.findViewById(R.id.service_rating);
-        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-            @Override
-            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                if (fromUser)
-                    openReviews(_id);
-            }
-        });
+        serviceView = v.findViewById(R.id.cv_contact);
+        serviceView.setOnClickListener(this);
+        serviceNameView = (TextView) v.findViewById(R.id.tv_phone);
 
-        contactView = v.findViewById(R.id.cv_contact);
-        phoneView = (TextView) v.findViewById(R.id.tv_phone);
-        locationView = v.findViewById(R.id.cv_location);
-        locationTextView = (TextView) v.findViewById(R.id.tv_location);
-
-        costChartView = (RecyclerView) v.findViewById(R.id.cost_chart);
+        itemsView = (RecyclerView) v.findViewById(R.id.cost_chart);
         Context context = v.getContext();
-        costChartView.setLayoutManager(new LinearLayoutManager(context));
+        itemsView.setLayoutManager(new LinearLayoutManager(context));
 
-        if (service != null && location != null && costChart != null)
-            updateViews(service, location, rating, costChart);
+        sumTotalView = (TextView) v.findViewById(R.id.tv_sum_total);
+
+        if (bill != null && items != null)
+            updateViews(bill, items);
         return v;
     }
 
@@ -228,33 +189,25 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
         fragmentInteractionListener = null;
     }
 
-    private void updateViews(@NonNull final Service service, @NonNull final Location location, float rating, @NonNull List<OfferedItemType> costChart) {
-        collapsingToolbarLayout.setTitle(service.name);
-        ratingBar.setRating(rating);
-        phoneView.setText(service.phone);
-        locationTextView.setText(location.name);
-        descriptionView.setText(service.description);
-        contactView.setOnClickListener(new View.OnClickListener() {
+    private void updateViews(@NonNull final Bill bill, @NonNull List<Item> items) {
+        collapsingToolbarLayout.setTitle(bill.service.name);
+        serviceView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_DIAL);
-                intent.setData(Uri.parse("tel:" + service.phone));
+                Intent intent = new Intent(getActivity(), ServiceViewerActivity.class);
+                intent.putExtra(Constants.extras._id, bill.service._id);
                 startActivity(intent);
             }
         });
-        locationTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + location.lon + "," + location.lat + "(" + Uri.encode(location.name) + ")");
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                if (mapIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-                    startActivity(mapIntent);
-                }
-            }
-        });
+        serviceNameView.setText(bill.service.name);
 
-        costChartView.setAdapter(new OfferedItemTypeRecyclerViewAdapter(costChart, mListener));
+        itemsView.setAdapter(new ItemRecyclerViewAdapter(items, mListener));
+
+        float sumTotal = 0.0f;
+        for (Item item : items) {
+            sumTotal += item.cost * item.count;
+        }
+        sumTotalView.setText("Rs. " + sumTotal);
         //TODO Fill other fields here
     }
 
@@ -297,10 +250,10 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        void onFetchFailed(android.database.SQLException e);
+        void onFetchFailed(SQLException e);
     }
 
-    public interface OnOfferedItemTypeFragmentInteractionListener {
-        void onOfferedItemTypeListItemSelected(OfferedItemType mItem);
+    public interface OnItemFragmentInteractionListener {
+        void onListItemSelected(Item mItem);
     }
 }

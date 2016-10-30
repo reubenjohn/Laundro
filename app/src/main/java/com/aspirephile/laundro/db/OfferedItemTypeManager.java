@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.support.annotation.NonNull;
 
+import com.aspirephile.laundro.db.LaundroContract.ItemType;
 import com.aspirephile.laundro.db.tables.OfferedItemType;
 
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public class OfferedItemTypeManager extends TableManager {
         qb.setTables(TABLE_NAME);
         String query = qb.buildQuery(new String[]{
                         _ID,
-                        "(select name from ItemType where ItemType._id = OfferedItemType._id)",
+                        "(select " + ItemType.NAME + " from " + ItemType.TABLE_NAME + " where " + ItemType.TABLE_NAME + "." + ItemType._ID + " = " + TABLE_NAME + "." + _ID + ")",
                         COST},
                 SERVICE + "=?",
                 null,

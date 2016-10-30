@@ -1,5 +1,6 @@
-package com.aspirephile.laundro.service;
+package com.aspirephile.laundro.bill;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,19 +9,19 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.aspirephile.laundro.R;
-import com.aspirephile.laundro.db.tables.Service;
-import com.aspirephile.laundro.service.ServiceListFragment.OnListFragmentInteractionListener;
+import com.aspirephile.laundro.bill.BillListFragment.OnListFragmentInteractionListener;
+import com.aspirephile.laundro.db.tables.Bill;
 
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
-class ServiceRecyclerViewAdapter extends RecyclerView.Adapter<ServiceRecyclerViewAdapter.ViewHolder> {
+class BillRecyclerViewAdapter extends RecyclerView.Adapter<BillRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Service> mValues;
+    private final List<Bill> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    ServiceRecyclerViewAdapter(List<Service> items, OnListFragmentInteractionListener listener) {
+    BillRecyclerViewAdapter(List<Bill> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -35,13 +36,23 @@ class ServiceRecyclerViewAdapter extends RecyclerView.Adapter<ServiceRecyclerVie
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.nameView.setText(holder.mItem.name);
-        Date createdAt = new Date(holder.mItem.createdAt);
-        String locationName = holder.mItem.location.name;
-        if (locationName.length() > 20)
-            locationName = locationName.substring(0, 20) + "...";
+        holder.nameView.setText(holder.mItem.service.name);
+        Date createdAt = new Date(holder.mItem.issuedAt);
         holder.createdAtView.setText(DateFormat.getDateInstance().format(createdAt));
-        holder.locationView.setText(locationName);
+        String status;
+        if (holder.mItem.payedAt == -2) {
+            status = "SERVICING";
+            holder.locationView.setTextColor(Color.BLUE);
+        } else if (holder.mItem.payedAt == -1) {
+            status = "READY";
+            holder.locationView.setTextColor(Color.RED);
+        } else if (holder.mItem.payedAt > 0) {
+            status = "PAYED";
+            holder.locationView.setTextColor(Color.GREEN);
+        } else {
+            status = "UNKNOWN";
+        }
+        holder.locationView.setText(status);
         //holder.ratingView.setProgress(mValues.get(position).rating);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -67,8 +78,7 @@ class ServiceRecyclerViewAdapter extends RecyclerView.Adapter<ServiceRecyclerVie
         final TextView nameView;
         final TextView locationView;
         final ProgressBar ratingView;
-        //public final TextView tag1View, tag2View, tag3View, tag4View;
-        Service mItem;
+        Bill mItem;
 
         ViewHolder(View view) {
             super(view);

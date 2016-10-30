@@ -131,6 +131,7 @@ public final class LaundroContract {
     public static class Bill implements BaseColumns {
         public static final String TABLE_NAME = "`" + Bill.class.getSimpleName() + "`";
         public static final String USER = "`user`";
+        public static final String SERVICE = "`service`";
         public static final String ISSUED_AT = "`issuedAt`";
         public static final String PAYED_AT = "`payedAt`";
         public static final String SQL_CREATE_ENTRIES = CREATE_TABLE(
@@ -138,10 +139,16 @@ public final class LaundroContract {
                 COLUMNS(
                         COLUMN(_ID, INTEGER_TYPE, NOT_NULL, UNIQUE),
                         COLUMN(USER, TEXT_TYPE, NOT_NULL, UNIQUE),
+                        COLUMN(SERVICE, INTEGER_TYPE, NOT_NULL),
                         COLUMN(ISSUED_AT, INTEGER_TYPE, NOT_NULL),
-                        COLUMN(PAYED_AT, INTEGER_TYPE, NOT_NULL)
+                        COLUMN(PAYED_AT, INTEGER_TYPE, NOT_NULL, DEFAULT, "-2")
                 ),
-                PRIMARY_KEY(_ID), FOREIGN_KEYS(FOREIGN_KEY(USER, User.TABLE_NAME, User._ID)));
+                PRIMARY_KEY(_ID),
+                FOREIGN_KEYS(
+                        FOREIGN_KEY(USER, User.TABLE_NAME, User._ID),
+                        FOREIGN_KEY(SERVICE, Service.TABLE_NAME, Service._ID)
+                )
+        );
         public static final String SQL_DELETE_ENTRIES = DROP_TABLE(TABLE_NAME);
     }
 

@@ -6,8 +6,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.support.annotation.NonNull;
 
-import com.aspirephile.laundro.db.LaundroContract.Bill;
-import com.aspirephile.laundro.db.tables.User;
+import com.aspirephile.laundro.db.tables.Bill;
+import com.aspirephile.laundro.db.tables.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.provider.BaseColumns._ID;
+import static com.aspirephile.laundro.db.LaundroContract.Bill.ISSUED_AT;
+import static com.aspirephile.laundro.db.LaundroContract.Bill.PAYED_AT;
+import static com.aspirephile.laundro.db.LaundroContract.Bill.SERVICE;
+import static com.aspirephile.laundro.db.LaundroContract.Bill.TABLE_NAME;
 
 public class BillManager extends TableManager {
 
@@ -17,19 +26,70 @@ public class BillManager extends TableManager {
 
     @Override
     public void onCreate(@NonNull SQLiteDatabase db) {
-        db.execSQL(Bill.SQL_CREATE_ENTRIES);
+        db.execSQL(LaundroContract.Bill.SQL_CREATE_ENTRIES);
     }
 
     @Override
     public void onDestroy(@NonNull SQLiteDatabase db) {
-        db.execSQL(Bill.SQL_DELETE_ENTRIES);
+        db.execSQL(LaundroContract.Bill.SQL_DELETE_ENTRIES);
     }
 
-    public QueryStatement getBill(int id) {
+
+    public QueryStatement getBillListQuery() {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        qb.setTables(Bill.TABLE_NAME);
-        String query = qb.buildQuery(new String[]{Bill.USER, Bill.ISSUED_AT, Bill.PAYED_AT},
-                Bill._ID + "=?",
+        qb.setTables(TABLE_NAME);
+        String query = qb.buildQuery(new String[]{
+                        _ID,
+                        "(select " + LaundroContract.Service.NAME + " from " + LaundroContract.Service.TABLE_NAME + " where " + LaundroContract.Service.TABLE_NAME + "." + LaundroContract.Service._ID + " = " + TABLE_NAME + "." + SERVICE + ")",
+                        ISSUED_AT,
+                        PAYED_AT},
+                null,
+                null,
+                null,
+                null,
+                null);
+        return new QueryStatement(dbHelper, query, null);
+    }
+
+    @NonNull
+    public List<Bill> getBillListFromResult(@NonNull Cursor c) {
+        ArrayList<Bill> list = new ArrayList<>();
+        try {
+            while (c.moveToNext()) {
+                Bill bill = new Bill();
+                bill._id = c.getInt(0);
+                bill.service = new Service();
+                bill.service.name = c.getString(1);
+                bill.issuedAt = c.getLong(2);
+                bill.payedAt = c.getLong(3);
+                list.add(bill);
+            }
+        } finally {
+            c.close();
+        }
+        return list;
+    }
+
+    public UpdateStatement payNow(int id) {
+        ContentValues values = new ContentValues();
+        values.put(LaundroContract.Bill.PAYED_AT, System.currentTimeMillis());
+        return new UpdateStatement(dbHelper,
+                LaundroContract.Bill.TABLE_NAME,
+                values,
+                LaundroContract.Bill._ID + "=?",
+                new String[]{String.valueOf(id)});
+    }
+
+    public QueryStatement getBill(long id) {
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        qb.setTables(TABLE_NAME);
+        String query = qb.buildQuery(new String[]{
+                        _ID,
+                        SERVICE,
+                        "(select " + LaundroContract.Service.NAME + " from " + LaundroContract.Service.TABLE_NAME + " where " + LaundroContract.Service.TABLE_NAME + "." + LaundroContract.Service._ID + " = " + TABLE_NAME + "." + SERVICE + ")",
+                        ISSUED_AT,
+                        PAYED_AT},
+                _ID + "=?",
                 null,
                 null,
                 null,
@@ -37,18 +97,15 @@ public class BillManager extends TableManager {
         return new QueryStatement(dbHelper, query, new String[]{String.valueOf(id)});
     }
 
-    public User getBillFromResult(Cursor c) {
+    public Bill getBillFromResult(Cursor c) {
         c.moveToFirst();
-        return new User(c);
-    }
-
-    public UpdateStatement payNow(int id) {
-        ContentValues values = new ContentValues();
-        values.put(Bill.PAYED_AT, System.currentTimeMillis());
-        return new UpdateStatement(dbHelper,
-                Bill.TABLE_NAME,
-                values,
-                Bill._ID + "=?",
-                new String[]{String.valueOf(id)});
+        Bill bill = new Bill();
+        bill._id = c.getInt(0);
+        bill.service = new Service();
+        bill.service._id = c.getLong(1);
+        bill.service.name = c.getString(2);
+        bill.issuedAt = c.getLong(2);
+        bill.payedAt = c.getLong(3);
+        return bill;
     }
 }
