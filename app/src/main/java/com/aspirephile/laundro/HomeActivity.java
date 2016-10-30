@@ -21,10 +21,10 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.aspirephile.laundro.db.tables.Service;
-import com.aspirephile.laundro.point.ServiceCreatorActivity;
-import com.aspirephile.laundro.point.ServiceListFragment;
-import com.aspirephile.laundro.point.ServiceViewerActivity;
 import com.aspirephile.laundro.preferences.SettingsActivity;
+import com.aspirephile.laundro.service.ServiceCreatorActivity;
+import com.aspirephile.laundro.service.ServiceListFragment;
+import com.aspirephile.laundro.service.ServiceViewerActivity;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 

@@ -1,6 +1,4 @@
-package com.aspirephile.laundro.point;
-
-import android.content.SharedPreferences;
+package com.aspirephile.laundro.service;
 
 import org.kawanfw.sql.api.client.android.execute.update.SQLEntity;
 

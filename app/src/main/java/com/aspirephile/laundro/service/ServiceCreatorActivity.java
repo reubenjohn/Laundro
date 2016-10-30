@@ -1,4 +1,4 @@
-package com.aspirephile.laundro.point;
+package com.aspirephile.laundro.service;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;

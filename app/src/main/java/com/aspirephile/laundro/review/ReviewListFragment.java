@@ -1,4 +1,4 @@
-package com.aspirephile.laundro.comment;
+package com.aspirephile.laundro.review;
 
 import android.content.Context;
 import android.database.Cursor;

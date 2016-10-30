@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".point.ServiceViewerActivity"
-    tools:showIn="@layout/fragment_point_viewer">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".service.ServiceViewerActivity"
+                tools:showIn="@layout/fragment_service_viewer">
 
     <FrameLayout
         android:id="@+id/container_point_viewer"

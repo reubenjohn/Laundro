@@ -1,5 +1,5 @@
 
-package com.aspirephile.laundro.comment;
+package com.aspirephile.laundro.review;
 
 import android.content.Intent;
 import android.content.SharedPreferences;

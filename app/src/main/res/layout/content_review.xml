@@ -7,7 +7,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                tools:context=".comment.ReviewListActivity"
+                tools:context=".review.ReviewListActivity"
                 tools:showIn="@layout/activity_review_list">
 
 
@@ -31,9 +31,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_margin="16dp"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="24dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="24dp"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         app:cardCornerRadius="16dp"
-        app:cardElevation="16dp">
+        app:cardElevation="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -1,4 +1,4 @@
-package com.aspirephile.laundro.point;
+package com.aspirephile.laundro.service;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.aspirephile.laundro.R;
 import com.aspirephile.laundro.db.tables.Service;
-import com.aspirephile.laundro.point.ServiceListFragment.OnListFragmentInteractionListener;
+import com.aspirephile.laundro.service.ServiceListFragment.OnListFragmentInteractionListener;
 
 import java.text.DateFormat;
 import java.util.Date;

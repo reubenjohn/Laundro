@@ -1,4 +1,4 @@
-package com.aspirephile.laundro.point;
+package com.aspirephile.laundro.service;
 
 import android.content.Intent;
 import android.database.SQLException;
@@ -10,10 +10,11 @@ import android.view.MenuItem;
 
 import com.aspirephile.laundro.Constants;
 import com.aspirephile.laundro.R;
+import com.aspirephile.laundro.db.tables.OfferedItemType;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
-public class ServiceViewerActivity extends AppCompatActivity implements ServiceViewerFragment.OnFragmentInteractionListener {
+public class ServiceViewerActivity extends AppCompatActivity implements ServiceViewerFragment.OnFragmentInteractionListener, ServiceViewerFragment.OnOfferedItemTypeFragmentInteractionListener {
 
     private Logger l = new Logger(ServiceViewerActivity.class);
 
@@ -90,10 +91,7 @@ public class ServiceViewerActivity extends AppCompatActivity implements ServiceV
     }
 
     @Override
-    public void onPointNotFound() {
-        Intent data = new Intent();
-        data.putExtra(Constants.extras.errorResult, Constants.errorResults.pointNotFound);
-        setResult(RESULT_CANCELED, data);
+    public void onOfferedItemTypeListItemSelected(OfferedItemType mItem) {
+        l.d("Offered item type selected: " + mItem);
     }
-
 }

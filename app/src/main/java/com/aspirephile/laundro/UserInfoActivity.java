@@ -79,8 +79,6 @@ public class UserInfoActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void updateProfile(User user) {
-        Snackbar.make(coordinatorLayout, user.toString(), Snackbar.LENGTH_LONG)
-                .show();
         tUsername.setText(user.email);
         editTextFirst.setText(user.name);
         //TODO Introduce first and last name into database

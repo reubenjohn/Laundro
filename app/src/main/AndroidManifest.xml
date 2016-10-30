@@ -38,15 +38,15 @@
             android:name=".preferences.SettingsActivity"
             android:label="@string/title_activity_settings"/>
         <activity
-            android:name=".point.ServiceCreatorActivity"
+            android:name=".service.ServiceCreatorActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
-            android:name=".point.ServiceViewerActivity"
+            android:name=".service.ServiceViewerActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
-            android:name=".comment.ReviewListActivity"
+            android:name=".review.ReviewListActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity

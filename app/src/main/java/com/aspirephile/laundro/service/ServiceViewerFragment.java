@@ -1,4 +1,4 @@
-package com.aspirephile.laundro.point;
+package com.aspirephile.laundro.service;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,22 +14,30 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.aspirephile.laundro.Constants;
 import com.aspirephile.laundro.R;
-import com.aspirephile.laundro.comment.ReviewListActivity;
-import com.aspirephile.laundro.db.LaundroDb;
 import com.aspirephile.laundro.db.OnQueryCompleteListener;
 import com.aspirephile.laundro.db.tables.Location;
+import com.aspirephile.laundro.db.tables.OfferedItemType;
 import com.aspirephile.laundro.db.tables.Service;
+import com.aspirephile.laundro.review.ReviewListActivity;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
+
+import java.util.List;
+
+import static com.aspirephile.laundro.db.LaundroDb.getLocationManager;
+import static com.aspirephile.laundro.db.LaundroDb.getOfferedItemTypeManagerManager;
+import static com.aspirephile.laundro.db.LaundroDb.getReviewManager;
+import static com.aspirephile.laundro.db.LaundroDb.getServiceManager;
 
 public class ServiceViewerFragment extends Fragment implements View.OnClickListener {
 
@@ -44,12 +52,15 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
     private long _id;
     private long userId;
     private Service service;
-    private Button reviewB;
     private float rating = 0.0f;
     private RatingBar ratingBar;
+    private View contactView, locationView;
     private TextView phoneView;
-    private TextView locationView;
+    private TextView locationTextView;
     private Location location;
+    private List<OfferedItemType> costChart;
+    private RecyclerView costChartView;
+    private OnOfferedItemTypeFragmentInteractionListener mListener;
 
     public ServiceViewerFragment() {
         l.onConstructor();
@@ -59,10 +70,19 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
     public void onAttach(Context context) {
         l.onAttach();
         super.onAttach(context);
-        try {
+
+        if (context instanceof ServiceViewerFragment.OnOfferedItemTypeFragmentInteractionListener) {
+            mListener = (ServiceViewerFragment.OnOfferedItemTypeFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement listener");
+        }
+
+        if (context instanceof OnFragmentInteractionListener) {
             fragmentInteractionListener = (OnFragmentInteractionListener) context;
-        } catch (ClassCastException e) {
-            e.printStackTrace();
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement listener");
         }
     }
 
@@ -78,28 +98,38 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
             fragmentInteractionListener.onFetchFailed(new SQLException("userId not found in shared preferences"));
         }
 
-        LaundroDb.getServiceManager().getService(_id).queryInBackground(new OnQueryCompleteListener() {
+        getServiceManager().getService(_id).queryInBackground(new OnQueryCompleteListener() {
             @Override
             public void onQueryComplete(Cursor c, android.database.SQLException e) {
                 if (e != null) {
                     fragmentInteractionListener.onFetchFailed(e);
                 } else {
-                    final Service service = LaundroDb.getServiceManager().getServiceFromResult(c);
-                    LaundroDb.getLocationManager().getLocation(service.location._id).queryInBackground(new OnQueryCompleteListener() {
+                    service = getServiceManager().getServiceFromResult(c);
+                    getLocationManager().getLocation(service.location._id).queryInBackground(new OnQueryCompleteListener() {
                         @Override
                         public void onQueryComplete(Cursor c, SQLException e) {
                             if (e != null) {
                                 fragmentInteractionListener.onFetchFailed(e);
                             } else {
-                                final Location location = LaundroDb.getLocationManager().getLocationFromCursor(c);
-                                LaundroDb.getReviewManager().getAverageReview(service._id).queryInBackground(new OnQueryCompleteListener() {
+                                location = getLocationManager().getLocationFromCursor(c);
+                                getReviewManager().getAverageReview(service._id).queryInBackground(new OnQueryCompleteListener() {
                                     @Override
                                     public void onQueryComplete(Cursor c, android.database.SQLException e) {
                                         if (e != null) {
                                             fragmentInteractionListener.onFetchFailed(e);
                                         } else {
-                                            float rating = LaundroDb.getReviewManager().getAverageRatingFromCursor(c);
-                                            updateViews(service, location, rating);
+                                            rating = getReviewManager().getAverageRatingFromCursor(c);
+                                            getOfferedItemTypeManagerManager().getOfferedItemTypeQuery(_id).queryInBackground(new OnQueryCompleteListener() {
+                                                @Override
+                                                public void onQueryComplete(Cursor c, SQLException e) {
+                                                    if (e != null) {
+                                                        fragmentInteractionListener.onFetchFailed(e);
+                                                    } else {
+                                                        costChart = getOfferedItemTypeManagerManager().getOfferedItemTypeListFromCursor(c);
+                                                        updateViews(service, location, rating, costChart);
+                                                    }
+                                                }
+                                            });
                                         }
                                     }
                                 });
@@ -116,12 +146,44 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         l.onCreateView();
-        View v = inflater.inflate(R.layout.fragment_point_viewer, container, false);
-        if (asserter.assertPointer(v))
-            bridgeXML(v);
-        initializeFields();
-        if (service != null && location != null)
-            updateViews(service, location, rating);
+        View v = inflater.inflate(R.layout.fragment_service_viewer, container, false);
+
+        coordinatorLayout = (CoordinatorLayout) v.findViewById(R.id.cl_point_viewer);
+        collapsingToolbarLayout = (CollapsingToolbarLayout) v.findViewById(R.id.ctl_point_viewer);
+
+        descriptionView = (TextView) v.findViewById(R.id.tv_point_viewer_description);
+
+        editFab = (FloatingActionButton) v.findViewById(R.id.fab_point_viewer_edit);
+        editFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, R.string.feature_not_available, Snackbar.LENGTH_LONG).show();
+            }
+        });
+
+        (v.findViewById(R.id.cv_review)).setOnClickListener(this);
+        ratingBar = (RatingBar) v.findViewById(R.id.service_rating);
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                if (fromUser)
+                    openReviews(_id);
+            }
+        });
+
+        contactView = v.findViewById(R.id.cv_contact);
+        contactView.setOnClickListener(this);
+        phoneView = (TextView) v.findViewById(R.id.tv_phone);
+        locationView = v.findViewById(R.id.cv_location);
+        locationView.setOnClickListener(this);
+        locationTextView = (TextView) v.findViewById(R.id.tv_location);
+
+        costChartView = (RecyclerView) v.findViewById(R.id.cost_chart);
+        Context context = v.getContext();
+        costChartView.setLayoutManager(new LinearLayoutManager(context));
+
+        if (service != null && location != null && costChart != null)
+            updateViews(service, location, rating, costChart);
         return v;
     }
 
@@ -168,59 +230,13 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
         fragmentInteractionListener = null;
     }
 
-    private void bridgeXML(View v) {
-        l.bridgeXML();
-
-        coordinatorLayout = (CoordinatorLayout) v.findViewById(R.id.cl_point_viewer);
-        collapsingToolbarLayout = (CollapsingToolbarLayout) v.findViewById(R.id.ctl_point_viewer);
-
-        descriptionView = (TextView) v.findViewById(R.id.tv_point_viewer_description);
-
-        editFab = (FloatingActionButton) v.findViewById(R.id.fab_point_viewer_edit);
-
-        reviewB = (Button) v.findViewById(R.id.b_point_viewer_reviews);
-
-        (v.findViewById(R.id.cv_review)).setOnClickListener(this);
-
-        ratingBar = (RatingBar) v.findViewById(R.id.service_rating);
-
-        phoneView = (TextView) v.findViewById(R.id.tv_phone);
-
-        locationView = (TextView) v.findViewById(R.id.tv_location);
-
-        l.bridgeXML(asserter.assertPointer(coordinatorLayout, collapsingToolbarLayout, descriptionView, editFab, ratingBar, phoneView, locationView));
-    }
-
-    private void initializeFields() {
-        l.initializeFields();
-
-        editFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, R.string.feature_not_available, Snackbar.LENGTH_LONG).show();
-            }
-        });
-
-        reviewB.setOnClickListener(this);
-        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-            @Override
-            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                if (fromUser)
-                    openReviews(_id);
-            }
-        });
-    }
-
-    private void updateViews(@NonNull final Service service, @NonNull final Location location, float rating) {
-        this.service = service;
-        this.location = location;
-        this.rating = rating;
+    private void updateViews(@NonNull final Service service, @NonNull final Location location, float rating, @NonNull List<OfferedItemType> costChart) {
         collapsingToolbarLayout.setTitle(service.name);
         ratingBar.setRating(rating);
         phoneView.setText(service.phone);
-        locationView.setText(location.name);
+        locationTextView.setText(location.name);
         descriptionView.setText(service.description);
-        phoneView.setOnClickListener(new View.OnClickListener() {
+        contactView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_DIAL);
@@ -239,6 +255,8 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
                 }
             }
         });
+
+        costChartView.setAdapter(new OfferedItemTypeRecyclerViewAdapter(costChart, mListener));
         //TODO Fill other fields here
     }
 
@@ -282,7 +300,9 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
      */
     public interface OnFragmentInteractionListener {
         void onFetchFailed(android.database.SQLException e);
+    }
 
-        void onPointNotFound();
+    public interface OnOfferedItemTypeFragmentInteractionListener {
+        void onOfferedItemTypeListItemSelected(OfferedItemType mItem);
     }
 }

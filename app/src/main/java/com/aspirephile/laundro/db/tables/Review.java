@@ -37,7 +37,7 @@ public class Review {
         service = c.getLong(1);
         user = c.getLong(2);
         timestamp = c.getLong(3);
-        rating = c.getLong(4);
+        rating = c.getFloat(4);
         description = c.getString(5);
     }
 

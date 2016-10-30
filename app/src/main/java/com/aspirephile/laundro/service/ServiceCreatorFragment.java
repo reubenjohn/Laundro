@@ -1,4 +1,4 @@
-package com.aspirephile.laundro.point;
+package com.aspirephile.laundro.service;
 
 import android.content.Context;
 import android.os.Bundle;

@@ -227,4 +227,7 @@
     <string name="service_list">Service List</string>
     <string name="sample_rating">4.5</string>
     <string name="your_review">Your review…</string>
+    <string name="sample_item_type_name">Hand Towel</string>
+    <string name="sample_cost">Rs. 35</string>
+    <string name="cost_chart">Cost Chart</string>
 </resources>

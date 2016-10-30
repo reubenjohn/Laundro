@@ -6,7 +6,7 @@
                                                  android:layout_width="match_parent"
                                                  android:layout_height="match_parent"
                                                  android:fitsSystemWindows="true"
-                                                 tools:context=".comment.ReviewListActivity">
+                                                 tools:context=".review.ReviewListActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/comment_app_bar"
@@ -31,8 +31,9 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_menu_add"
-        app:backgroundTint="@color/colorPrimary"/>
+        app:backgroundTint="@color/colorPrimary"
+        app:elevation="4dp"/>
 
-    <include layout="@layout/content_comment"/>
+    <include layout="@layout/content_review"/>
 
 </android.support.design.widget.CoordinatorLayout>
