@@ -11,33 +11,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.provider.BaseColumns._ID;
-import static com.aspirephile.laundro.db.LaundroContract.Service.CREATED_AT;
-import static com.aspirephile.laundro.db.LaundroContract.Service.DESCRIPTION;
-import static com.aspirephile.laundro.db.LaundroContract.Service.LOCATION;
-import static com.aspirephile.laundro.db.LaundroContract.Service.NAME;
-import static com.aspirephile.laundro.db.LaundroContract.Service.PHONE;
-import static com.aspirephile.laundro.db.LaundroContract.Service.TABLE_NAME;
+import static com.aspirephile.laundro.db.LaundroContract.Item.*;
 
-public class ServiceManager extends TableManager {
-    ServiceManager(LaundroDb dbHelper) {
+public class ItemManager extends TableManager {
+    ItemManager(LaundroDb dbHelper) {
         super(dbHelper);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(LaundroContract.Service.SQL_CREATE_ENTRIES);
+        db.execSQL(SQL_CREATE_ENTRIES);
     }
 
     @Override
     public void onDestroy(SQLiteDatabase db) {
-        db.execSQL(LaundroContract.Service.SQL_DELETE_ENTRIES);
+        db.execSQL(SQL_DELETE_ENTRIES);
 
     }
 
-    public QueryStatement getAllServices() {
+    public QueryStatement getOfferedItemTypes() {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(TABLE_NAME);
-        String query = qb.buildQuery(new String[]{_ID, NAME, CREATED_AT, LOCATION, PHONE, DESCRIPTION},
+        String query = qb.buildQuery(new String[]{_ID, OFFERED_ITEM_TYPE, BILL},
                 null,
                 null,
                 null,
@@ -47,7 +42,7 @@ public class ServiceManager extends TableManager {
     }
 
     @NonNull
-    public List<Service> getServicesFromResult(@NonNull Cursor c) {
+    public List<Service> getOfferedItemTypesFromResult(@NonNull Cursor c) {
         ArrayList<Service> list = new ArrayList<>();
         try {
             while (c.moveToNext()) {
@@ -60,10 +55,10 @@ public class ServiceManager extends TableManager {
         return list;
     }
 
-    public QueryStatement getService(long _id) {
+    public QueryStatement getOfferedItemTypes(int _id) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(TABLE_NAME);
-        String query = qb.buildQuery(new String[]{_ID, NAME, CREATED_AT, LOCATION, PHONE, DESCRIPTION},
+        String query = qb.buildQuery(new String[]{_ID, OFFERED_ITEM_TYPE, BILL},
                 LaundroContract.Service._ID + "=?",
                 null,
                 null,
@@ -72,8 +67,8 @@ public class ServiceManager extends TableManager {
         return new QueryStatement(dbHelper, query, new String[]{String.valueOf(_id)});
     }
 
-    public Service getServiceFromResult(@NonNull Cursor c) {
-        List<Service> services = getServicesFromResult(c);
+    public Service getOfferedItemTypeFromResult(@NonNull Cursor c) {
+        List<Service> services = getOfferedItemTypesFromResult(c);
         if (services.size() > 0)
             return services.get(0);
         else

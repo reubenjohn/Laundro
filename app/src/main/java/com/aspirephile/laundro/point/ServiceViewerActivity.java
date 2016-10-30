@@ -48,17 +48,17 @@ public class ServiceViewerActivity extends AppCompatActivity implements ServiceV
     private void openPointViewerFragment() {
         // find the retained fragment on activity restarts
         FragmentManager fm = getSupportFragmentManager();
-        ServiceViewerFragment pointViewerF = (ServiceViewerFragment) fm.findFragmentByTag(Constants.tags.pointViewerFragment);
+        ServiceViewerFragment serviceViewerF = (ServiceViewerFragment) fm.findFragmentByTag(Constants.tags.pointViewerFragment);
 
-        if (!asserter.assertPointerQuietly(pointViewerF)) {
+        if (!asserter.assertPointerQuietly(serviceViewerF)) {
             l.i("Creating new " + ServiceViewerFragment.class.getSimpleName() + " fragment");
-            pointViewerF = new ServiceViewerFragment();
+            serviceViewerF = new ServiceViewerFragment();
             fm.beginTransaction()
-                    .replace(R.id.container_point_viewer, pointViewerF, Constants.tags.pointViewerFragment)
+                    .replace(R.id.container_point_viewer, serviceViewerF, Constants.tags.pointViewerFragment)
                     .commit();
         }
-        if (asserter.assertPointer(pointViewerF))
-            pointViewerF.setID(_id);
+        if (asserter.assertPointer(serviceViewerF))
+            serviceViewerF.setID(_id);
     }
 
     @Override

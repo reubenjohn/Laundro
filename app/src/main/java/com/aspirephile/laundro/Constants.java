@@ -16,6 +16,7 @@ public class Constants {
         public static final String pointNotFound = "POINT_NOT_FOUND";
         public static final String badPID = "BAD_PID";
         public static final String badIntent = "BAD_INTENT";
+        public static final String badUsername = "BAD_USERNAME";
     }
 
 

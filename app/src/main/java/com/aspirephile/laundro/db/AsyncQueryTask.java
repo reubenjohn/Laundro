@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 class AsyncQueryTask extends AsyncTask<QueryStatement, Void, Cursor> {
     private final OnQueryCompleteListener onQueryCompleteListener;
@@ -26,6 +27,7 @@ class AsyncQueryTask extends AsyncTask<QueryStatement, Void, Cursor> {
     @Override
     protected void onPostExecute(Cursor cursor) {
         super.onPostExecute(cursor);
+        Log.d("AsyncQueryTask", "Retrieved " + cursor.getCount() + " rows, with " + cursor.getColumnCount() + " columns");
         onQueryCompleteListener.onQueryComplete(cursor, e);
     }
 }

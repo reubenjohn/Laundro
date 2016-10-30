@@ -1,8 +1,10 @@
 
 package com.aspirephile.laundro.comment;
 
-import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -10,27 +12,26 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.aspirephile.laundro.Constants;
 import com.aspirephile.laundro.R;
+import com.aspirephile.laundro.db.LaundroDb;
+import com.aspirephile.laundro.db.OnInsertCompleteListener;
+import com.aspirephile.laundro.db.OnQueryCompleteListener;
+import com.aspirephile.laundro.db.tables.Review;
+import com.aspirephile.laundro.db.tables.User;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
-import org.kawanfw.sql.api.client.android.AceQLDBManager;
-import org.kawanfw.sql.api.client.android.BackendConnection;
-import org.kawanfw.sql.api.client.android.execute.OnGetPrepareStatement;
-import org.kawanfw.sql.api.client.android.execute.update.OnUpdateCompleteListener;
+public class ReviewListActivity extends AppCompatActivity implements ReviewListFragment.OnListFragmentInteractionListener {
+    private Logger l = new Logger(ReviewListActivity.class);
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-public class CommentListActivity extends AppCompatActivity implements CommentListFragment.OnListFragmentInteractionListener {
-    private Logger l = new Logger(CommentListActivity.class);
-
-    private String PID;
+    private long serviceId;
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
-    private CommentListFragment commentListF;
+    private ReviewListFragment commentListF;
     private EditText description;
+    private long userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +44,10 @@ public class CommentListActivity extends AppCompatActivity implements CommentLis
             data.putExtra(Constants.extras.errorResult, Constants.errorResults.badIntent);
             setResult(RESULT_CANCELED, data);
             return;
-        } else if ((PID = i.getStringExtra(Constants.extras._id)) == null) {
+        } else if ((serviceId = i.getLongExtra(Constants.extras._id, -1)) == -1L) {
             Intent data = new Intent();
             data.putExtra(Constants.extras.errorResult, Constants.errorResults.badPID);
-            data.putExtra(Constants.extras._id, PID);
+            data.putExtra(Constants.extras._id, serviceId);
             setResult(RESULT_CANCELED, data);
             return;
         }
@@ -54,17 +55,62 @@ public class CommentListActivity extends AppCompatActivity implements CommentLis
         setContentView(R.layout.activity_comment_list);
 
         description = (EditText) findViewById(R.id.et_comment_description);
+
+
+        SharedPreferences sp = getSharedPreferences(Constants.files.authentication, MODE_PRIVATE);
+        String username = sp.getString(Constants.preferences.username, null);
+        if (username == null) {
+            Intent data = new Intent();
+            data.putExtra(Constants.extras.errorResult, Constants.errorResults.badUsername);
+            setResult(RESULT_CANCELED, data);
+            return;
+        }
+
+        l.d("Querying for user with username: " + username);
+        LaundroDb.getUserManager().getUser(username).queryInBackground(new OnQueryCompleteListener() {
+            @Override
+            public void onQueryComplete(Cursor c, SQLException e) {
+                if (e != null) {
+                    onCommentListLoadFailed(e);
+                } else {
+                    User user = LaundroDb.getUserManager().getUserFromResult(c);
+                    userId = user._id;
+                    l.i("Retrieved userId: " + userId);
+                }
+            }
+        });
+
+        findViewById(R.id.fab_comment_list).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Review review = new Review(serviceId, userId, System.currentTimeMillis(), 3.5f, description.getText().toString());
+                LaundroDb.getReviewManager().insertReview(review).executeInBackground(new OnInsertCompleteListener() {
+                    @Override
+                    public void onInsertComplete(long rowId, SQLException e) {
+                        if (e != null) {
+                            e.printStackTrace();
+                            Toast.makeText(ReviewListActivity.this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                        } else {
+                            commentListF.onRefresh();
+                        }
+                    }
+                });
+            }
+        });
+        //Review review = new Review(sp.getString());
+        //LaundroDb.getReviewManager().insertReview();
+        /*
         findViewById(R.id.fab_comment_list).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AceQLDBManager.executeUpdate(new OnGetPrepareStatement() {
                     @Override
                     public PreparedStatement onGetPreparedStatement(BackendConnection remoteConnection) {
-                        String sql = "insert into ParlayComment (_id,email,description) values (?,?,?)";
+                        String sql = "insert into ParlayComment (serviceId,email,description) values (?,?,?)";
                         PreparedStatement preparedStatement = null;
                         try {
                             preparedStatement = remoteConnection.prepareStatement(sql);
-                            preparedStatement.setString(1, PID);
+                            preparedStatement.setString(1, serviceId);
                             String username = getSharedPreferences(Constants.files.authentication, Context.MODE_PRIVATE)
                                     .getString(Constants.preferences.username, null);
                             preparedStatement.setString(2, username);
@@ -87,6 +133,7 @@ public class CommentListActivity extends AppCompatActivity implements CommentLis
                 });
             }
         });
+        */
         openCommentListFragment();
     }
 
@@ -94,11 +141,11 @@ public class CommentListActivity extends AppCompatActivity implements CommentLis
     private void openCommentListFragment() {
         // find the retained fragment on activity restarts
         FragmentManager fm = getSupportFragmentManager();
-        commentListF = (CommentListFragment) fm.findFragmentByTag(Constants.tags.commentListFragment);
+        commentListF = (ReviewListFragment) fm.findFragmentByTag(Constants.tags.commentListFragment);
 
         if (!asserter.assertPointerQuietly(commentListF)) {
-            l.i("Creating new " + CommentListFragment.class.getSimpleName() + " fragment");
-            commentListF = CommentListFragment.newInstance(1, PID);
+            l.i("Creating new " + ReviewListFragment.class.getSimpleName() + " fragment");
+            commentListF = ReviewListFragment.newInstance(1, serviceId, userId);
             fm.beginTransaction()
                     .replace(R.id.container_comment_list, commentListF, Constants.tags.commentListFragment)
                     .commit();
@@ -127,7 +174,7 @@ public class CommentListActivity extends AppCompatActivity implements CommentLis
     }
 
     @Override
-    public void onCommentListItemSelected(CommentListItem.CommentItem item) {
+    public void onCommentListItemSelected(Review item) {
         l.d("Comment list item selected");
     }
 

@@ -22,7 +22,7 @@ public class UpdateStatement {
     }
 
     public int execute() {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         l.d("Executing update statement");
         int count = db.update(tableName, values, whereClause, whereArgs);
         l.d("Update statement affected " + count + " rows");

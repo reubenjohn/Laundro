@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.aspirephile.shared.debug.Logger;
 
+import java.util.Arrays;
+
 public class QueryStatement {
     private final LaundroDb dbHelper;
     private final String query;
@@ -19,7 +21,7 @@ public class QueryStatement {
 
     public Cursor execute() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        l.d("Executing query: " + query);
+        l.d("Executing query: " + query + " with arguments: " + Arrays.toString(selectionArgs));
         return db.rawQuery(query, selectionArgs);
     }
 

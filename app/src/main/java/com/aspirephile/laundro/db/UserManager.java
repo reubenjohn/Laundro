@@ -6,8 +6,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.support.annotation.NonNull;
 
-import com.aspirephile.laundro.db.LaundroContract.User;
-import com.aspirephile.laundro.db.tables.ParlayUser;
+import com.aspirephile.laundro.db.tables.User;
+
+import static android.provider.BaseColumns._ID;
+import static com.aspirephile.laundro.db.LaundroContract.User.EMAIL;
+import static com.aspirephile.laundro.db.LaundroContract.User.NAME;
+import static com.aspirephile.laundro.db.LaundroContract.User.SQL_CREATE_ENTRIES;
+import static com.aspirephile.laundro.db.LaundroContract.User.SQL_DELETE_ENTRIES;
+import static com.aspirephile.laundro.db.LaundroContract.User.TABLE_NAME;
+
 
 public class UserManager extends TableManager {
 
@@ -17,19 +24,19 @@ public class UserManager extends TableManager {
 
     @Override
     public void onCreate(@NonNull SQLiteDatabase db) {
-        db.execSQL(User.SQL_CREATE_ENTRIES);
+        db.execSQL(SQL_CREATE_ENTRIES);
     }
 
     @Override
     public void onDestroy(@NonNull SQLiteDatabase db) {
-        db.execSQL(User.SQL_DELETE_ENTRIES);
+        db.execSQL(SQL_DELETE_ENTRIES);
     }
 
     public QueryStatement isUserAuthenticated(@NonNull String email) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        qb.setTables(User.TABLE_NAME);
+        qb.setTables(TABLE_NAME);
         String query = qb.buildQuery(new String[]{"count(*)"},
-                User.COLUMN_NAME_EMAIL + "=?",
+                EMAIL + "=?",
                 null,
                 null,
                 null,
@@ -50,9 +57,9 @@ public class UserManager extends TableManager {
 
     public QueryStatement getUser(@NonNull String email) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        qb.setTables(User.TABLE_NAME);
-        String query = qb.buildQuery(new String[]{User.COLUMN_NAME_EMAIL, User.COLUMN_NAME_NAME},
-                User.COLUMN_NAME_EMAIL + "=?",
+        qb.setTables(TABLE_NAME);
+        String query = qb.buildQuery(new String[]{_ID, EMAIL, NAME},
+                EMAIL + "=?",
                 null,
                 null,
                 null,
@@ -60,18 +67,30 @@ public class UserManager extends TableManager {
         return new QueryStatement(dbHelper, query, new String[]{email});
     }
 
-    public ParlayUser getUserFromResult(Cursor c) {
+    public QueryStatement getUser(long _id) {
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        qb.setTables(TABLE_NAME);
+        String query = qb.buildQuery(new String[]{_ID, EMAIL, NAME},
+                _ID + "=?",
+                null,
+                null,
+                null,
+                null);
+        return new QueryStatement(dbHelper, query, new String[]{String.valueOf(_id)});
+    }
+
+    public User getUserFromResult(Cursor c) {
         c.moveToFirst();
-        return new ParlayUser(c);
+        return new User(c);
     }
 
     public UpdateStatement updateName(String email, String name) {
         ContentValues values = new ContentValues();
-        values.put(User.COLUMN_NAME_NAME, name);
+        values.put(NAME, name);
         return new UpdateStatement(dbHelper,
-                User.TABLE_NAME,
+                TABLE_NAME,
                 values,
-                User.COLUMN_NAME_EMAIL + "=?",
+                EMAIL + "=?",
                 new String[]{email});
     }
 }

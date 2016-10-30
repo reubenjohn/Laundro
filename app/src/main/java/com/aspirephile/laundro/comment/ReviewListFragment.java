@@ -1,6 +1,8 @@
 package com.aspirephile.laundro.comment;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -13,18 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.aspirephile.laundro.R;
+import com.aspirephile.laundro.db.LaundroDb;
+import com.aspirephile.laundro.db.OnQueryCompleteListener;
+import com.aspirephile.laundro.db.tables.Review;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
-import org.kawanfw.sql.api.client.android.AceQLDBManager;
-import org.kawanfw.sql.api.client.android.BackendConnection;
-import org.kawanfw.sql.api.client.android.execute.OnGetPrepareStatement;
-import org.kawanfw.sql.api.client.android.execute.query.OnGetResultSetListener;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -32,32 +29,36 @@ import java.util.ArrayList;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class CommentListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener {
+public class ReviewListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private static final String ARG_PID = "_id";
-    private Logger l = new Logger(CommentListFragment.class);
+    private static final String ARG_SERVICE_ID = "serviceId";
+    private static final String ARG_USER_ID = "userId";
+    private Logger l = new Logger(ReviewListFragment.class);
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
 
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private String PID;
+    private long serviceId, userId;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public CommentListFragment() {
+    public ReviewListFragment() {
+        serviceId = -1;
+        userId = -1;
     }
 
     @SuppressWarnings("unused")
-    public static CommentListFragment newInstance(int columnCount, String PID) {
-        CommentListFragment fragment = new CommentListFragment();
+    public static ReviewListFragment newInstance(int columnCount, long serviceId, long userId) {
+        ReviewListFragment fragment = new ReviewListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
-        args.putString(CommentListFragment.ARG_PID, PID);
+        args.putLong(ARG_SERVICE_ID, serviceId);
+        args.putLong(ARG_USER_ID, userId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -69,7 +70,8 @@ public class CommentListFragment extends Fragment implements SwipeRefreshLayout.
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            PID = getArguments().getString(ARG_PID);
+            serviceId = getArguments().getLong(ARG_SERVICE_ID);
+            userId = getArguments().getLong(ARG_USER_ID);
         }
 
         onRefresh();
@@ -118,47 +120,24 @@ public class CommentListFragment extends Fragment implements SwipeRefreshLayout.
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setRefreshing(true);
         }
-        final String sql = "select email as poster, _id, CID, timestamp, description from ParlayComment where _id=? order by CID desc";
 
-        OnGetPrepareStatement getPreparedStatementListener = new OnGetPrepareStatement() {
-            @Override
-            public PreparedStatement onGetPreparedStatement(BackendConnection remoteConnection) {
-                try {
-                    PreparedStatement preparedStatement = remoteConnection.prepareStatement(sql);
-                    preparedStatement.setString(1, PID);
-                    return preparedStatement;
-                } catch (SQLException e) {
-                    mListener.onCommentListLoadFailed(e);
-                    return null;
-                }
-            }
-        };
-
-        OnGetResultSetListener onGetResultSetListener = new OnGetResultSetListener() {
-            @Override
-            public void onGetResultSet(ResultSet rs, SQLException e) {
-                if (e != null) {
-                    mListener.onCommentListLoadFailed(e);
-                } else {
-                    ArrayList<CommentListItem.CommentItem> list = new ArrayList<>();
-                    Context context = getContext();
-                    try {
-                        while (rs.next()) {
-                            list.add(new CommentListItem.CommentItem(rs, context));
-                        }
-
-                        l.i("Parlay Comment query completed with " + list.size() + " results");
+        if (serviceId != -1 && userId != -1) {
+            l.d("Fetching reviews for serviceId: " + serviceId + " and userId=" + userId);
+            LaundroDb.getReviewManager().getAllReviews(serviceId, userId).queryInBackground(new OnQueryCompleteListener() {
+                @Override
+                public void onQueryComplete(Cursor c, SQLException e) {
+                    if (e != null) {
+                        mListener.onCommentListLoadFailed(e);
+                    } else {
+                        List<Review> list = LaundroDb.getReviewManager().getRowsFromResult(c);
+                        l.i("Point query completed with " + list.size() + " results");
                         if (asserter.assertPointer(recyclerView))
-                            recyclerView.setAdapter(new CommentRecyclerViewAdapter(list, mListener));
+                            recyclerView.setAdapter(new ReviewRecyclerViewAdapter(list, mListener));
                         swipeRefreshLayout.setRefreshing(false);
-
-                    } catch (SQLException e1) {
-                        mListener.onCommentListLoadFailed(e1);
                     }
                 }
-            }
-        };
-        AceQLDBManager.executeQuery(getPreparedStatementListener, onGetResultSetListener);
+            });
+        }
     }
 
     @Override
@@ -182,7 +161,7 @@ public class CommentListFragment extends Fragment implements SwipeRefreshLayout.
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        void onCommentListItemSelected(CommentListItem.CommentItem item);
+        void onCommentListItemSelected(Review item);
 
         void onCommentListLoadFailed(SQLException e);
     }

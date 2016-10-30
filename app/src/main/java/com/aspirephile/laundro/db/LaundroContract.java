@@ -12,6 +12,8 @@ public final class LaundroContract {
     private static final String COMMA_SEP = ", ";
     private static final String NOT_NULL = "NOT NULL";
     private static final String UNIQUE = "UNIQUE";
+    private static final String DEFAULT = "DEFAULT";
+
     // To prevent someone from accidentally instantiating the contract class,
     // make the constructor private.
     private LaundroContract() {
@@ -45,45 +47,178 @@ public final class LaundroContract {
         return res;
     }
 
-    private static String CREATE_TABLE(String name, String columns, String primaryKeys) {
-        return "CREATE TABLE " + name + " ( " + columns + COMMA_SEP + primaryKeys + " )";
+    private static String FOREIGN_KEY(String key, String referenceTable, String referenceColumn) {
+        return "FOREIGN KEY(" + key + ") REFERENCES " + referenceTable + "(" + referenceColumn + ")";
+    }
+
+    private static String FOREIGN_KEYS(String... foreignKeys) {
+        return separated(COMMA_SEP, foreignKeys);
+    }
+
+    private static String CREATE_TABLE(String name, String columns, String primaryKeys, String foreignKeys) {
+        String res = "CREATE TABLE " + name + " ( " + columns;
+        if (primaryKeys != null && primaryKeys.length() > 0) {
+            res += COMMA_SEP + primaryKeys;
+        }
+        if (foreignKeys != null && foreignKeys.length() > 0) {
+            res += COMMA_SEP + foreignKeys;
+        }
+        res += " )";
+        return res;
     }
 
     private static String DROP_TABLE(String name) {
         return "DROP TABLE " + name;
     }
 
-    /* Inner class that defines the table contents */
-    public static final class User implements BaseColumns {
-        public static final String COLUMN_NAME_EMAIL = "`email`";
-        public static final String COLUMN_NAME_NAME = "`name`";
-        static final String TABLE_NAME = "`User`";
+    public static final class Location implements BaseColumns {
+        public static final String TABLE_NAME = "`" + Location.class.getSimpleName() + "`";
+        public static final String NAME = "`name`";
+        public static final String LAT = "`lat`";
+        public static final String LON = "`lon`";
         //TODO Ensure distinct emails
-        static final String SQL_CREATE_ENTRIES = CREATE_TABLE(
+        public static final String SQL_CREATE_ENTRIES = CREATE_TABLE(
                 TABLE_NAME,
                 COLUMNS(
                         COLUMN(_ID, INTEGER_TYPE, NOT_NULL, UNIQUE),
-                        COLUMN(COLUMN_NAME_EMAIL, TEXT_TYPE, NOT_NULL, UNIQUE),
-                        COLUMN(COLUMN_NAME_NAME, TEXT_TYPE, NOT_NULL)
+                        COLUMN(NAME, TEXT_TYPE, NOT_NULL, UNIQUE),
+                        COLUMN(LAT, INTEGER_TYPE, NOT_NULL),
+                        COLUMN(LON, INTEGER_TYPE, NOT_NULL)
                 ),
-                PRIMARY_KEY(_ID));
-        static final String SQL_DELETE_ENTRIES = DROP_TABLE(TABLE_NAME);
+                PRIMARY_KEY(_ID), null);
+        public static final String SQL_DELETE_ENTRIES = DROP_TABLE(TABLE_NAME);
+    }
+
+    public static final class User implements BaseColumns {
+        public static final String TABLE_NAME = "`" + User.class.getSimpleName() + "`";
+        public static final String EMAIL = "`email`";
+        public static final String NAME = "`name`";
+        //TODO Ensure distinct emails
+        public static final String SQL_CREATE_ENTRIES = CREATE_TABLE(
+                TABLE_NAME,
+                COLUMNS(
+                        COLUMN(_ID, INTEGER_TYPE, NOT_NULL, UNIQUE),
+                        COLUMN(EMAIL, TEXT_TYPE, NOT_NULL, UNIQUE),
+                        COLUMN(NAME, TEXT_TYPE, NOT_NULL)
+                ),
+                PRIMARY_KEY(_ID), null);
+        public static final String SQL_DELETE_ENTRIES = DROP_TABLE(TABLE_NAME);
     }
 
     public static class Service implements BaseColumns {
-        static final String TABLE_NAME = "`Service`";
-        static final String COLUMN_NAME_NAME = "`name`";
-        static final String COLUMN_NAME_CREATED_AT = "`createdAt`";
-        static final String COLUMN_NAME_LOCATION = "`location`";
-        static final String SQL_CREATE_ENTRIES = CREATE_TABLE(
+        public static final String TABLE_NAME = "`" + Service.class.getSimpleName() + "`";
+        public static final String NAME = "`name`";
+        public static final String CREATED_AT = "`createdAt`";
+        public static final String LOCATION = "`location`";
+        public static final String PHONE = "`phone`";
+        public static final String DESCRIPTION = "`description`";
+        public static final String SQL_CREATE_ENTRIES = CREATE_TABLE(
                 TABLE_NAME,
                 COLUMNS(
                         COLUMN(_ID, INTEGER_TYPE, NOT_NULL, UNIQUE),
-                        COLUMN(COLUMN_NAME_NAME, TEXT_TYPE, NOT_NULL, UNIQUE),
-                        COLUMN(COLUMN_NAME_CREATED_AT, INTEGER_TYPE, NOT_NULL),
-                        COLUMN(COLUMN_NAME_LOCATION, INTEGER_TYPE, NOT_NULL)
+                        COLUMN(NAME, TEXT_TYPE, NOT_NULL, UNIQUE),
+                        COLUMN(CREATED_AT, INTEGER_TYPE, NOT_NULL),
+                        COLUMN(LOCATION, INTEGER_TYPE, NOT_NULL),
+                        COLUMN(PHONE, TEXT_TYPE, NOT_NULL),
+                        COLUMN(DESCRIPTION, TEXT_TYPE, NOT_NULL, DEFAULT, "Not Specified")
                 ),
-                PRIMARY_KEY(_ID));
-        static final String SQL_DELETE_ENTRIES = DROP_TABLE(TABLE_NAME);
+                PRIMARY_KEY(_ID),
+                FOREIGN_KEYS(FOREIGN_KEY(LOCATION, Location.TABLE_NAME, Location._ID)));
+        public static final String SQL_DELETE_ENTRIES = DROP_TABLE(TABLE_NAME);
+    }
+
+    public static class Bill implements BaseColumns {
+        public static final String TABLE_NAME = "`" + Bill.class.getSimpleName() + "`";
+        public static final String USER = "`user`";
+        public static final String ISSUED_AT = "`issuedAt`";
+        public static final String PAYED_AT = "`payedAt`";
+        public static final String SQL_CREATE_ENTRIES = CREATE_TABLE(
+                TABLE_NAME,
+                COLUMNS(
+                        COLUMN(_ID, INTEGER_TYPE, NOT_NULL, UNIQUE),
+                        COLUMN(USER, TEXT_TYPE, NOT_NULL, UNIQUE),
+                        COLUMN(ISSUED_AT, INTEGER_TYPE, NOT_NULL),
+                        COLUMN(PAYED_AT, INTEGER_TYPE, NOT_NULL)
+                ),
+                PRIMARY_KEY(_ID), FOREIGN_KEYS(FOREIGN_KEY(USER, User.TABLE_NAME, User._ID)));
+        public static final String SQL_DELETE_ENTRIES = DROP_TABLE(TABLE_NAME);
+    }
+
+    public static class ItemType implements BaseColumns {
+        public static final String TABLE_NAME = "`" + ItemType.class.getSimpleName() + "`";
+        public static final String NAME = "`name`";
+        public static final String SQL_CREATE_ENTRIES = CREATE_TABLE(
+                TABLE_NAME,
+                COLUMNS(
+                        COLUMN(_ID, INTEGER_TYPE, NOT_NULL, UNIQUE),
+                        COLUMN(NAME, TEXT_TYPE, NOT_NULL, UNIQUE)
+                ),
+                PRIMARY_KEY(_ID), FOREIGN_KEYS());
+        public static final String SQL_DELETE_ENTRIES = DROP_TABLE(TABLE_NAME);
+    }
+
+    public static class OfferedItemType implements BaseColumns {
+        public static final String TABLE_NAME = "`" + OfferedItemType.class.getSimpleName() + "`";
+        public static final String ITEM_TYPE = "`itemType`";
+        public static final String SERVICE = "`service`";
+        public static final String COST = "`cost`";
+        public static final String SQL_CREATE_ENTRIES = CREATE_TABLE(
+                TABLE_NAME,
+                COLUMNS(
+                        COLUMN(_ID, INTEGER_TYPE, NOT_NULL, UNIQUE),
+                        COLUMN(ITEM_TYPE, INTEGER_TYPE, NOT_NULL),
+                        COLUMN(SERVICE, INTEGER_TYPE, NOT_NULL),
+                        COLUMN(COST, INTEGER_TYPE, NOT_NULL)
+                ),
+                PRIMARY_KEY(_ID),
+                FOREIGN_KEYS(
+                        FOREIGN_KEY(ITEM_TYPE, ItemType.TABLE_NAME, _ID),
+                        FOREIGN_KEY(SERVICE, Service.TABLE_NAME, _ID)
+                ));
+        public static final String SQL_DELETE_ENTRIES = DROP_TABLE(TABLE_NAME);
+    }
+
+    public static class Item implements BaseColumns {
+        public static final String TABLE_NAME = "`" + Item.class.getSimpleName() + "`";
+        public static final String OFFERED_ITEM_TYPE = "`offeredItemType`";
+        public static final String BILL = "`bill`";
+        public static final String SQL_CREATE_ENTRIES = CREATE_TABLE(
+                TABLE_NAME,
+                COLUMNS(
+                        COLUMN(_ID, INTEGER_TYPE, NOT_NULL, UNIQUE),
+                        COLUMN(OFFERED_ITEM_TYPE, INTEGER_TYPE, NOT_NULL),
+                        COLUMN(BILL, INTEGER_TYPE, NOT_NULL)
+                ),
+                PRIMARY_KEY(_ID),
+                FOREIGN_KEYS(
+                        FOREIGN_KEY(OFFERED_ITEM_TYPE, OfferedItemType.TABLE_NAME, _ID),
+                        FOREIGN_KEY(BILL, Bill.TABLE_NAME, _ID)
+                ));
+        public static final String SQL_DELETE_ENTRIES = DROP_TABLE(TABLE_NAME);
+    }
+
+    public static class Review implements BaseColumns {
+        public static final String TABLE_NAME = "`" + Review.class.getSimpleName() + "`";
+        public static final String SERVICE = "`service`";
+        public static final String USER = "`user`";
+        public static final String TIMESTAMP = "`timestamp`";
+        public static final String RATING = "`rating`";
+        public static final String DESCRIPTION = "`description`";
+        public static final String SQL_CREATE_ENTRIES = CREATE_TABLE(
+                TABLE_NAME,
+                COLUMNS(
+                        COLUMN(_ID, INTEGER_TYPE, NOT_NULL, UNIQUE),
+                        COLUMN(SERVICE, INTEGER_TYPE, NOT_NULL),
+                        COLUMN(USER, TEXT_TYPE, NOT_NULL),
+                        COLUMN(TIMESTAMP, INTEGER_TYPE, NOT_NULL),
+                        COLUMN(RATING, INTEGER_TYPE, NOT_NULL),
+                        COLUMN(DESCRIPTION, TEXT_TYPE, NOT_NULL)
+                ),
+                PRIMARY_KEY(_ID),
+                FOREIGN_KEYS(
+                        FOREIGN_KEY(SERVICE, Service.TABLE_NAME, _ID),
+                        FOREIGN_KEY(USER, User.TABLE_NAME, _ID)
+                ));
+        public static final String SQL_DELETE_ENTRIES = DROP_TABLE(TABLE_NAME);
     }
 }

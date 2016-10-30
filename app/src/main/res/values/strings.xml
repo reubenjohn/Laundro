@@ -215,9 +215,12 @@
     <string name="content_description_contact">Contact Profile Picture</string>
     <string name="point_viewer_for">For</string>
     <string name="point_viewer_against">Against</string>
-    <string name="show_comments">Show Comments</string>
+    <string name="show_reviews">Show Reviews</string>
     <string name="comments">Comments</string>
     <string name="sample_timestamp">4 hours ago</string>
     <string name="sample_comment_description">Please elaborate. What you are saying doesn\'t seem to have enough merit to it. If you need more support please be clear.</string>
     <string name="error_authentication_unknown">Unknown authentication failure occurred</string>
+    <string name="contact">Contact</string>
+    <string name="not_specified">Not specified</string>
+    <string name="phone">Phone</string>
 </resources>

@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import com.aspirephile.laundro.db.LaundroDb;
 import com.aspirephile.laundro.db.OnQueryCompleteListener;
-import com.aspirephile.laundro.db.tables.ParlayUser;
+import com.aspirephile.laundro.db.tables.User;
 
 public class UserInfoActivity extends AppCompatActivity implements View.OnClickListener {
     ImageView contactImgImgView;
@@ -71,14 +71,14 @@ public class UserInfoActivity extends AppCompatActivity implements View.OnClickL
                     Snackbar.make(coordinatorLayout, e.getLocalizedMessage(), Snackbar.LENGTH_LONG)
                             .show();
                 } else {
-                    ParlayUser user = LaundroDb.getUserManager().getUserFromResult(c);
+                    User user = LaundroDb.getUserManager().getUserFromResult(c);
                     updateProfile(user);
                 }
             }
         });
     }
 
-    private void updateProfile(ParlayUser user) {
+    private void updateProfile(User user) {
         Snackbar.make(coordinatorLayout, user.toString(), Snackbar.LENGTH_LONG)
                 .show();
         tUsername.setText(user.email);

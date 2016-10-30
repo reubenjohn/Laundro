@@ -7,19 +7,20 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.aspirephile.laundro.R;
+import com.aspirephile.laundro.db.tables.Review;
 
 import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link CommentListItem.CommentItem} and makes a call to the
- * specified {@link CommentListFragment.OnListFragmentInteractionListener}.
+ * specified {@link ReviewListFragment.OnListFragmentInteractionListener}.
  */
-public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecyclerViewAdapter.ViewHolder> {
+public class ReviewRecyclerViewAdapter extends RecyclerView.Adapter<ReviewRecyclerViewAdapter.ViewHolder> {
 
-    private final List<CommentListItem.CommentItem> mValues;
-    private final CommentListFragment.OnListFragmentInteractionListener mListener;
+    private final List<Review> mValues;
+    private final ReviewListFragment.OnListFragmentInteractionListener mListener;
 
-    public CommentRecyclerViewAdapter(List<CommentListItem.CommentItem> items, CommentListFragment.OnListFragmentInteractionListener listener) {
+    public ReviewRecyclerViewAdapter(List<Review> items, ReviewListFragment.OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -35,8 +36,8 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecy
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.descView.setText(mValues.get(position).description);
-        holder.timestampView.setText(mValues.get(position).timestamp.toString());
-        holder.usernameView.setText(mValues.get(position).poster);
+        holder.timestampView.setText(String.valueOf(mValues.get(position).timestamp));
+        holder.usernameView.setText(String.valueOf(mValues.get(position).user));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,7 +61,7 @@ public class CommentRecyclerViewAdapter extends RecyclerView.Adapter<CommentRecy
         public final TextView descView;
         public final TextView timestampView;
         public final TextView usernameView;
-        public CommentListItem.CommentItem mItem;
+        public Review mItem;
 
         public ViewHolder(View view) {
             super(view);
