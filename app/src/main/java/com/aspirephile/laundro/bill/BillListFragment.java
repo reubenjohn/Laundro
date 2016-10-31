@@ -54,12 +54,16 @@ public class BillListFragment extends Fragment implements SwipeRefreshLayout.OnR
     private SwipeRefreshLayout swipeRefreshLayout;
     private String PID;
     private char standing = '\0';
+    private Handler handler;
+    private ArrayList<Runnable> scheduledNotifications;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
     public BillListFragment() {
+        handler = new Handler();
+        scheduledNotifications = new ArrayList<Runnable>();
     }
 
     public static BillListFragment newInstance(int columnCount) {
@@ -162,12 +166,15 @@ public class BillListFragment extends Fragment implements SwipeRefreshLayout.OnR
         final Random r = new Random();
         for (final Bill bill : list) {
             if (bill.payedAt == -2) {
-                new Handler().postDelayed(new Runnable() {
+                Runnable runnable = new Runnable() {
                     @Override
                     public void run() {
-                        showNotification(getActivity(), bill);
+
+                        showNotification(getActivity().getApplicationContext(), bill);
                     }
-                }, 5000 + r.nextLong() % 10000);
+                };
+                scheduledNotifications.add(runnable);
+                handler.postDelayed(runnable, 5000 + r.nextLong() % 10000);
             }
         }
     }
@@ -187,6 +194,13 @@ public class BillListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify((int) bill._id, builder.build());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        for (Runnable r : scheduledNotifications)
+            handler.removeCallbacks(r);
     }
 
     public void scheduleNotification(Context context, long delay, Bill bill) {//delay is after how much time(in millis) from current time you want to schedule the notification

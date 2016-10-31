@@ -242,7 +242,7 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
                 startActivity(intent);
             }
         });
-        locationTextView.setOnClickListener(new View.OnClickListener() {
+        locationView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + location.lon + "," + location.lat + "(" + Uri.encode(location.name) + ")");
