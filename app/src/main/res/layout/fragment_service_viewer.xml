@@ -161,6 +161,7 @@
                                 android:layout_alignParentEnd="true"
                                 android:layout_alignParentRight="true"
                                 android:layout_centerVertical="true"
+                                android:layout_margin="8dp"
                                 android:src="@drawable/common_full_open_on_phone"
                                 android:tint="@color/cardview_dark_background"/>
                         </RelativeLayout>
@@ -211,6 +212,7 @@
                                 android:layout_alignParentEnd="true"
                                 android:layout_alignParentRight="true"
                                 android:layout_centerVertical="true"
+                                android:layout_margin="8dp"
                                 android:src="@drawable/map_pin"
                                 android:tint="@color/cardview_dark_background"/>
                         </RelativeLayout>
