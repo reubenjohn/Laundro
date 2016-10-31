@@ -17,7 +17,7 @@ import android.widget.Toast;
 import com.aspirephile.laundro.Constants;
 import com.aspirephile.laundro.R;
 import com.aspirephile.laundro.db.LaundroDb;
-import com.aspirephile.laundro.db.OnInsertCompleteListener;
+import com.aspirephile.laundro.db.async.OnInsertCompleteListener;
 import com.aspirephile.laundro.db.tables.Review;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;

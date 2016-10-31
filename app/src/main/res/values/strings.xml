@@ -239,4 +239,7 @@
     <string name="sample_count">2</string>
     <string name="sample_sum">70</string>
     <string name="sample_item_cost">35</string>
+    <string name="eta">Expected Service Time</string>
+    <string name="give_laundry">Give Laundy</string>
+    <string name="title_activity_bill_creator">BillCreatorActivity</string>
 </resources>

@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 
 import com.aspirephile.laundro.R;
 import com.aspirephile.laundro.db.LaundroDb;
-import com.aspirephile.laundro.db.OnQueryCompleteListener;
+import com.aspirephile.laundro.db.async.OnQueryCompleteListener;
 import com.aspirephile.laundro.db.tables.Review;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;

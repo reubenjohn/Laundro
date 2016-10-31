@@ -41,7 +41,7 @@ public class BillViewerActivity extends AppCompatActivity implements BillViewerF
             return;
         }
 
-        setContentView(R.layout.activity_point_viewer);
+        setContentView(R.layout.activity_service_viewer);
 
         openBillViewerFragment();
     }

@@ -1,8 +1,9 @@
-package com.aspirephile.laundro.db;
+package com.aspirephile.laundro.db.async;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.aspirephile.laundro.db.LaundroDb;
 import com.aspirephile.shared.debug.Logger;
 
 public class UpdateStatement {
@@ -13,7 +14,7 @@ public class UpdateStatement {
     private final String[] whereArgs;
     private Logger l = new Logger(UpdateStatement.class);
 
-    UpdateStatement(LaundroDb dbHelper, String tableName, ContentValues values, String whereClause, String[] whereArgs) {
+    public UpdateStatement(LaundroDb dbHelper, String tableName, ContentValues values, String whereClause, String[] whereArgs) {
         this.dbHelper = dbHelper;
         this.tableName = tableName;
         this.values = values;

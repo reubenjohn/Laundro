@@ -89,6 +89,12 @@
         </activity>
 
         <receiver android:name=".bill.BillCompletionNotificationPublisher"/>
+
+        <activity
+            android:name=".bill.BillCreatorActivity"
+            android:label="@string/title_activity_bill_creator"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

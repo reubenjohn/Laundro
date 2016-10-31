@@ -1,4 +1,4 @@
-package com.aspirephile.laundro.db;
+package com.aspirephile.laundro.db.async;
 
 import android.database.SQLException;
 import android.os.AsyncTask;

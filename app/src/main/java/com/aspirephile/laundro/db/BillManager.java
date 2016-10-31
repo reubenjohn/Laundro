@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.support.annotation.NonNull;
 
+import com.aspirephile.laundro.db.async.QueryStatement;
+import com.aspirephile.laundro.db.async.UpdateStatement;
 import com.aspirephile.laundro.db.tables.Bill;
 import com.aspirephile.laundro.db.tables.Service;
 

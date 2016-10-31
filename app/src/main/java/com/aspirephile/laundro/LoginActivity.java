@@ -32,7 +32,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 import com.aspirephile.laundro.db.LaundroDb;
-import com.aspirephile.laundro.db.OnQueryCompleteListener;
+import com.aspirephile.laundro.db.async.OnQueryCompleteListener;
 import com.aspirephile.laundro.db.tables.User;
 import com.aspirephile.laundro.preferences.SettingsActivity;
 import com.aspirephile.shared.debug.Logger;

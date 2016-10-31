@@ -22,7 +22,7 @@ import android.widget.TextView;
 
 import com.aspirephile.laundro.Constants;
 import com.aspirephile.laundro.R;
-import com.aspirephile.laundro.db.OnQueryCompleteListener;
+import com.aspirephile.laundro.db.async.OnQueryCompleteListener;
 import com.aspirephile.laundro.db.tables.Bill;
 import com.aspirephile.laundro.db.tables.Item;
 import com.aspirephile.laundro.review.ReviewListActivity;

@@ -19,7 +19,7 @@ public class ServiceCreatorActivity extends AppCompatActivity implements Service
     protected void onCreate(Bundle savedInstanceState) {
         l.onCreate();
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_point_creator);
+        setContentView(R.layout.activity_service_creator);
         openOrganizationCreatorFragment();
     }
 

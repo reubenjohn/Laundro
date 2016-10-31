@@ -17,7 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aspirephile.laundro.db.LaundroDb;
-import com.aspirephile.laundro.db.OnQueryCompleteListener;
+import com.aspirephile.laundro.db.async.OnQueryCompleteListener;
+import com.aspirephile.laundro.db.async.OnUpdateCompleteListener;
 import com.aspirephile.laundro.db.tables.User;
 
 public class UserInfoActivity extends AppCompatActivity implements View.OnClickListener {
@@ -98,7 +99,7 @@ public class UserInfoActivity extends AppCompatActivity implements View.OnClickL
         final String lname = editTextLast.getText().toString();
 
         LaundroDb.getUserManager().updateName(email, fname)
-                .executeInBackground(new com.aspirephile.laundro.db.OnUpdateCompleteListener() {
+                .executeInBackground(new OnUpdateCompleteListener() {
                     @Override
                     public void onUpdateComplete(int cursor, SQLException e) {
                         if (e != null) {

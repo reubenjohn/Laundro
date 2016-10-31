@@ -19,12 +19,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aspirephile.laundro.Constants;
 import com.aspirephile.laundro.R;
-import com.aspirephile.laundro.db.OnQueryCompleteListener;
+import com.aspirephile.laundro.db.async.OnQueryCompleteListener;
 import com.aspirephile.laundro.db.tables.Location;
 import com.aspirephile.laundro.db.tables.OfferedItemType;
 import com.aspirephile.laundro.db.tables.Service;
@@ -33,6 +35,7 @@ import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
 import java.util.List;
+import java.util.Random;
 
 import static com.aspirephile.laundro.db.LaundroDb.getLocationManager;
 import static com.aspirephile.laundro.db.LaundroDb.getOfferedItemTypeManagerManager;
@@ -57,10 +60,12 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
     private View contactView, locationView;
     private TextView phoneView;
     private TextView locationTextView;
+    private Button giveLaundryView;
     private Location location;
     private List<OfferedItemType> costChart;
     private RecyclerView costChartView;
     private OnOfferedItemTypeFragmentInteractionListener mListener;
+    private TextView etaView;
 
     public ServiceViewerFragment() {
         l.onConstructor();
@@ -161,6 +166,15 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
             }
         });
 
+        etaView = (TextView) v.findViewById(R.id.tv_service_eta);
+        giveLaundryView = (Button) v.findViewById(R.id.b_give_laundry);
+        giveLaundryView.setOnClickListener(this);
+
+        contactView = v.findViewById(R.id.cv_contact);
+        phoneView = (TextView) v.findViewById(R.id.tv_phone);
+        locationView = v.findViewById(R.id.cv_location);
+        locationTextView = (TextView) v.findViewById(R.id.tv_location);
+
         (v.findViewById(R.id.cv_review)).setOnClickListener(this);
         ratingBar = (RatingBar) v.findViewById(R.id.service_rating);
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
@@ -170,11 +184,6 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
                     openReviews(_id);
             }
         });
-
-        contactView = v.findViewById(R.id.cv_contact);
-        phoneView = (TextView) v.findViewById(R.id.tv_phone);
-        locationView = v.findViewById(R.id.cv_location);
-        locationTextView = (TextView) v.findViewById(R.id.tv_location);
 
         costChartView = (RecyclerView) v.findViewById(R.id.cost_chart);
         Context context = v.getContext();
@@ -230,7 +239,11 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
 
     private void updateViews(@NonNull final Service service, @NonNull final Location location, float rating, @NonNull List<OfferedItemType> costChart) {
         collapsingToolbarLayout.setTitle(service.name);
-        ratingBar.setRating(rating);
+
+        long eta = Math.abs(new Random().nextLong() % (3 * 24 * 60 * 60 * 1000));
+        int etaDays = (int) (eta / (24 * 60 * 60 * 1000));
+        etaView.setText(etaDays + " days");
+
         phoneView.setText(service.phone);
         locationTextView.setText(location.name);
         descriptionView.setText(service.description);
@@ -255,6 +268,8 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
         });
 
         costChartView.setAdapter(new OfferedItemTypeRecyclerViewAdapter(costChart, mListener));
+
+        ratingBar.setRating(rating);
         //TODO Fill other fields here
     }
 
@@ -266,7 +281,13 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.fab_point_creator) {
+        if (id == R.id.b_give_laundry) {
+//            Intent i = new Intent(getActivity(), BillCreatorActivity.class);
+//            i.putExtra(Constants.extras._id, _id);
+//            startActivity(i);
+
+            Toast.makeText(getActivity(), R.string.feature_not_available, Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.fab_point_creator) {
             editPoint();
         } else if (id == R.id.b_point_viewer_reviews || id == R.id.cv_review || id == R.id.service_rating) {
             l.d("Opening reviews for id: " + _id);

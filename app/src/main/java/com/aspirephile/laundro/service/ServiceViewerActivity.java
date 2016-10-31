@@ -40,7 +40,7 @@ public class ServiceViewerActivity extends AppCompatActivity implements ServiceV
             return;
         }
 
-        setContentView(R.layout.activity_point_viewer);
+        setContentView(R.layout.activity_service_viewer);
 
         openPointViewerFragment();
     }

@@ -1,8 +1,9 @@
-package com.aspirephile.laundro.db;
+package com.aspirephile.laundro.db.async;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.aspirephile.laundro.db.LaundroDb;
 import com.aspirephile.shared.debug.Logger;
 
 public class InsertStatement {
@@ -12,7 +13,7 @@ public class InsertStatement {
     private final String nullColumnHack;
     private Logger l = new Logger(InsertStatement.class);
 
-    InsertStatement(LaundroDb dbHelper, String tableName, ContentValues values) {
+    public InsertStatement(LaundroDb dbHelper, String tableName, ContentValues values) {
         this.dbHelper = dbHelper;
         this.tableName = tableName;
         this.values = values;

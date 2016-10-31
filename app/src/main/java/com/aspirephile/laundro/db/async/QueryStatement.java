@@ -1,8 +1,9 @@
-package com.aspirephile.laundro.db;
+package com.aspirephile.laundro.db.async;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.aspirephile.laundro.db.LaundroDb;
 import com.aspirephile.shared.debug.Logger;
 
 import java.util.Arrays;
@@ -13,7 +14,7 @@ public class QueryStatement {
     private final String[] selectionArgs;
     private Logger l = new Logger(QueryStatement.class);
 
-    QueryStatement(LaundroDb dbHelper, String sql, String[] selectionArgs) {
+    public QueryStatement(LaundroDb dbHelper, String sql, String[] selectionArgs) {
         this.dbHelper = dbHelper;
         this.query = sql;
         this.selectionArgs = selectionArgs;
