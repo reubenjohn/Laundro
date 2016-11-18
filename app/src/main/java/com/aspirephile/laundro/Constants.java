@@ -3,6 +3,7 @@ package com.aspirephile.laundro;
 public class Constants {
     public static final class files {
 
+        public static final String firstRun = "firstRun";
         public static String authentication = "authentication";
         public static String settings = "settings";
     }
@@ -47,6 +48,7 @@ public class Constants {
         public static final class request {
 
             public static final int authentication = 1111;
+            public static final int about = 1121;
         }
 
         public static final class result {

@@ -38,6 +38,13 @@ public class HomeActivity extends AppCompatActivity
 
     private ServiceListFragment pointListF;
     private CoordinatorLayout coordinatorLayout;
+    private NavigationView navigationView;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        navigationView.setCheckedItem(R.id.nav_service_list);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +72,7 @@ public class HomeActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         View v = navigationView.getHeaderView(0);
@@ -170,10 +177,9 @@ public class HomeActivity extends AppCompatActivity
         } else if (id == R.id.nav_manage) {
             Intent intent = new Intent(HomeActivity.this, SettingsActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.nav_about) {
+            Intent intent = new Intent(HomeActivity.this, AboutActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

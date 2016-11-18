@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.aspirephile.laundro.Constants;
 import com.aspirephile.laundro.R;
 import com.aspirephile.laundro.db.LaundroDb;
 import com.aspirephile.laundro.db.async.OnQueryCompleteListener;
@@ -189,7 +190,8 @@ public class BillListFragment extends Fragment implements SwipeRefreshLayout.OnR
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 
         Intent intent = new Intent(context, BillViewerActivity.class);
-        PendingIntent activity = PendingIntent.getActivity(context, (int) bill._id, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        intent.putExtra(Constants.extras._id, bill._id);
+        PendingIntent activity = PendingIntent.getActivity(context, (int) bill._id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(activity);
 
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

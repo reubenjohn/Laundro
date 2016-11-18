@@ -242,4 +242,7 @@
     <string name="eta">Expected Service Time</string>
     <string name="give_laundry">Give Laundy</string>
     <string name="title_activity_bill_creator">BillCreatorActivity</string>
+    <string name="title_activity_about">About</string>
+    <string name="restricted_to_laundry_service">You must own this service to edit it.</string>
+    <string name="about_html"><![CDATA[<h2 id=\\\"about\\\"></h2><p>The application is to be installed by both the customer as well as the laundry service. Each of them would login to the app differently and would be exposed to different features of the app. The essential feature of the app is that it isn’t restricted to one laundry. The following sections are subject to change as the app progresses to adjust for new/changed features.</p><h2 id=\\\"features\\\">Features</h2><ul><li>Find best, cheapest nearby laundry services.</li><li>Get instant info about laundry services</li><li>Review &amp; rate laundry service</li><li>Notifications when laundry is ready</li><li>Automatically calculate bills</li></ul>]]></string>
 </resources>

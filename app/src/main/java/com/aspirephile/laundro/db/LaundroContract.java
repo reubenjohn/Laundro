@@ -121,7 +121,7 @@ public final class LaundroContract {
                         COLUMN(CREATED_AT, INTEGER_TYPE, NOT_NULL),
                         COLUMN(LOCATION, INTEGER_TYPE, NOT_NULL),
                         COLUMN(PHONE, TEXT_TYPE, NOT_NULL),
-                        COLUMN(DESCRIPTION, TEXT_TYPE, NOT_NULL, DEFAULT, "Not Specified")
+                        COLUMN(DESCRIPTION, TEXT_TYPE, NOT_NULL, DEFAULT, "'Not Specified'")
                 ),
                 PRIMARY_KEY(_ID),
                 FOREIGN_KEYS(FOREIGN_KEY(LOCATION, Location.TABLE_NAME, Location._ID)));

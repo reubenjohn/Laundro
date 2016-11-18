@@ -162,7 +162,7 @@ public class ServiceViewerFragment extends Fragment implements View.OnClickListe
         editFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, R.string.feature_not_available, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(view, R.string.restricted_to_laundry_service, Snackbar.LENGTH_LONG).show();
             }
         });
 

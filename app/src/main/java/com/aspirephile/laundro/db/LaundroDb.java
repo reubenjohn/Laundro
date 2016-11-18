@@ -33,7 +33,7 @@ public class LaundroDb extends SQLiteOpenHelper {
 
     @NonNull
     public static LocationManager getLocationManager() {
-        if (userManager != null)
+        if (locationManager != null)
             return locationManager;
         else
             return (locationManager = new LocationManager(dbHelper));

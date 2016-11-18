@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,10 +18,12 @@ import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aspirephile.laundro.AboutActivity;
 import com.aspirephile.laundro.Constants;
 import com.aspirephile.laundro.HomeActivity;
 import com.aspirephile.laundro.LoginActivity;
 import com.aspirephile.laundro.R;
+import com.aspirephile.shared.FirstRunManager;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
@@ -30,6 +31,7 @@ public class SplashFragment extends Fragment {
     private final Logger l = new Logger(SplashFragment.class);
     private NullPointerAsserter asserter = new NullPointerAsserter(l);
     private TextView textView;
+    private FirstRunManager firstRunManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,12 +55,19 @@ public class SplashFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         l.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != Activity.RESULT_OK) {
-            Toast.makeText(getActivity(), R.string.authentication_failed, Toast.LENGTH_SHORT).show();
-        }
+
         switch (requestCode) {
             case Constants.codes.request.authentication:
-                launchHomeActivity();
+                if (resultCode == Activity.RESULT_OK) {
+                    launchHomeActivity();
+                } else {
+                    Toast.makeText(getActivity(), R.string.authentication_failed, Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case Constants.codes.request.about:
+                firstRunManager
+                        .setSharedPrefsName(Constants.files.firstRun)
+                        .sendFirstRunCompletionResult(true);
                 break;
             default:
                 l.w("Unhandled request code!");
@@ -73,10 +82,18 @@ public class SplashFragment extends Fragment {
     }
 
     private void initializeFields() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                getActivity().runOnUiThread(new Runnable() {
+        firstRunManager = new FirstRunManager(getActivity());
+        firstRunManager
+                .setSharedPrefsName(Constants.files.firstRun)
+                .setFirstRunRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent i = new Intent(getActivity(), AboutActivity.class);
+                        startActivityForResult(i, Constants.codes.request.about);
+                        getActivity().overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+                    }
+                })
+                .setSubsequentRunRunnable(new Runnable() {
                     @Override
                     public void run() {
                         SharedPreferences sp = getActivity().getSharedPreferences(Constants.files.authentication, Context.MODE_PRIVATE);
@@ -86,12 +103,10 @@ public class SplashFragment extends Fragment {
                             Intent i = new Intent(getActivity(), LoginActivity.class);
                             startActivityForResult(i, Constants.codes.request.authentication);
                             getActivity().overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
-                            //getActivity().finish();
                         }
                     }
-                });
-            }
-        }, Constants.properties.splashScreenDuration);
+                })
+                .scheduleAction((int) Constants.properties.splashScreenDuration);
 
         ViewTreeObserver vto = textView.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
