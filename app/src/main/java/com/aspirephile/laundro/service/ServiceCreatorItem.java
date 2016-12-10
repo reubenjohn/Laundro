@@ -1,11 +1,6 @@
 package com.aspirephile.laundro.service;
 
-import org.kawanfw.sql.api.client.android.execute.update.SQLEntity;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-public class ServiceCreatorItem implements SQLEntity {
+public class ServiceCreatorItem {
     private String title;
     private String description;
     private String username;
@@ -34,22 +29,5 @@ public class ServiceCreatorItem implements SQLEntity {
         this.description = description;
     }
 
-    @Override
-    public String getEntityName() {
-        return "Point";
-    }
-
-    @Override
-    public String[] getAttributeNames() {
-        return new String[]{"email", "title", "description"};
-    }
-
-    @Override
-    public int onPrepareStatement(PreparedStatement preparedStatement, int i) throws SQLException {
-        preparedStatement.setString(i++, username);
-        preparedStatement.setString(i++, title);
-        preparedStatement.setString(i++, description);
-        return i;
-    }
 
 }

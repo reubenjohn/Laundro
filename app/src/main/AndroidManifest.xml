@@ -89,12 +89,11 @@
         </activity>
 
         <receiver android:name=".bill.BillCompletionNotificationPublisher"/>
+        <service
+            android:name=".LaundryCompletePullService"
+            android:exported="false"
+            android:process=":LaundryCompletePullService"/>
 
-        <activity
-            android:name=".bill.BillCreatorActivity"
-            android:label="@string/title_activity_bill_creator"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
         <activity
             android:name=".AboutActivity"
             android:label="@string/title_activity_about"

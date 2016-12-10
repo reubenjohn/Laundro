@@ -1,1 +1,1 @@
-include ':app', ':shared', ':aceqlandroid'
+include ':app', ':shared'

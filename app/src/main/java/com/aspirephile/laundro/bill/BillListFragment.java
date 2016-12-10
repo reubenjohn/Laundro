@@ -1,21 +1,13 @@
 package com.aspirephile.laundro.bill;
 
-import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.RingtoneManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.support.annotation.IntRange;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,7 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.aspirephile.laundro.Constants;
+import com.aspirephile.laundro.LaundryCompletePullService;
 import com.aspirephile.laundro.R;
 import com.aspirephile.laundro.db.LaundroDb;
 import com.aspirephile.laundro.db.async.OnQueryCompleteListener;
@@ -34,7 +26,6 @@ import com.aspirephile.shared.debug.NullPointerAsserter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -157,45 +148,17 @@ public class BillListFragment extends Fragment implements SwipeRefreshLayout.OnR
                         recyclerView.setAdapter(new BillRecyclerViewAdapter(list, mListener));
                     swipeRefreshLayout.setRefreshing(false);
 
-                    scheduleNotifications(list);
+                    //scheduleNotifications(list);
+                    startLaundryCompletePullService();
                 }
             }
         });
     }
 
-    private void scheduleNotifications(List<Bill> list) {
-        final Random r = new Random();
-        for (final Bill bill : list) {
-            if (bill.payedAt == -2) {
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-
-                        showNotification(getActivity().getApplicationContext(), bill);
-                    }
-                };
-                scheduledNotifications.add(runnable);
-                handler.postDelayed(runnable, 5000 + r.nextLong() % 10000);
-            }
-        }
-    }
-
-    public void showNotification(Context context, Bill bill) {//delay is after how much time(in millis) from current time you want to schedule the notification
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
-                .setContentTitle(bill.service.name + " has just finished with your batch of clothes")
-                .setContentText("You can clothes your clothes from their service center when they're open")
-                .setAutoCancel(true)
-                .setSmallIcon(R.drawable.my_logo)
-                .setLargeIcon(((BitmapDrawable) context.getResources().getDrawable(R.drawable.my_logo)).getBitmap())
-                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
-
-        Intent intent = new Intent(context, BillViewerActivity.class);
-        intent.putExtra(Constants.extras._id, bill._id);
-        PendingIntent activity = PendingIntent.getActivity(context, (int) bill._id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(activity);
-
-        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify((int) bill._id, builder.build());
+    private void startLaundryCompletePullService() {
+        Intent serviceIntent = new Intent(getActivity(), LaundryCompletePullService.class);
+        //serviceIntent.setData(Uri.parse(dataUrl));
+        getActivity().startService(serviceIntent);
     }
 
     @Override
@@ -205,6 +168,7 @@ public class BillListFragment extends Fragment implements SwipeRefreshLayout.OnR
             handler.removeCallbacks(r);
     }
 
+    /*
     public void scheduleNotification(Context context, long delay, Bill bill) {//delay is after how much time(in millis) from current time you want to schedule the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setContentTitle(bill.service.name + " has just finished with your batch of clothes")
@@ -232,6 +196,7 @@ public class BillListFragment extends Fragment implements SwipeRefreshLayout.OnR
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent);
     }
+    */
 
     /**
      * This interface must be implemented by activities that contain this

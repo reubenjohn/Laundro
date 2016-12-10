@@ -20,10 +20,6 @@ import com.aspirephile.laundro.R;
 import com.aspirephile.shared.debug.Logger;
 import com.aspirephile.shared.debug.NullPointerAsserter;
 
-import org.kawanfw.sql.api.client.android.AceQLDBManager;
-import org.kawanfw.sql.api.client.android.execute.update.OnUpdateCompleteListener;
-
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -222,22 +218,6 @@ public class ServiceCreatorFragment extends Fragment implements View.OnClickList
 
                 List<ServiceCreatorItem> list = new ArrayList<>();
                 list.add(serviceCreatorItem);
-                AceQLDBManager.insertSQLEntityList(list, new OnUpdateCompleteListener() {
-                    @Override
-                    public void onUpdateComplete(int result, SQLException e) {
-                        if (e != null) {
-                            pointCreatorListener.onCreationFailed();
-                            e.printStackTrace();
-                        } else {
-                            l.i("No of rows inserted: " + result);
-                            if (result == 0) {
-                                pointCreatorListener.onCreationFailed();
-                            } else {
-                                pointCreatorListener.onCreationSuccess();
-                            }
-                        }
-                    }
-                });
             } else {
                 Snackbar.make(coordinatorLayout, R.string.point_error_ui, Snackbar.LENGTH_SHORT)
                         .show();

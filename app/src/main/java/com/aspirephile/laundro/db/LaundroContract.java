@@ -138,7 +138,7 @@ public final class LaundroContract {
                 TABLE_NAME,
                 COLUMNS(
                         COLUMN(_ID, INTEGER_TYPE, NOT_NULL, UNIQUE),
-                        COLUMN(USER, TEXT_TYPE, NOT_NULL, UNIQUE),
+                        COLUMN(USER, TEXT_TYPE, NOT_NULL),
                         COLUMN(SERVICE, INTEGER_TYPE, NOT_NULL),
                         COLUMN(ISSUED_AT, INTEGER_TYPE, NOT_NULL),
                         COLUMN(PAYED_AT, INTEGER_TYPE, NOT_NULL, DEFAULT, "-2")

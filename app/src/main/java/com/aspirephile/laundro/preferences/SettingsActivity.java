@@ -21,14 +21,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.aspirephile.laundro.Constants;
 import com.aspirephile.laundro.R;
 
-import org.kawanfw.sql.api.client.android.AceQLDBManager;
-import org.kawanfw.sql.api.client.android.BackendConnection;
-import org.kawanfw.sql.api.client.android.OnRemoteConnectionEstablishedListener;
-
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -262,54 +256,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     Log.i("SettingsActivity", "Attempting to connect to: " + url);
                     preference.setSummary(getString(R.string.setting_data_sync_backend_url_connecting));
                     final long start = System.currentTimeMillis();
-
-                    AceQLDBManager.getRemoteConnection(url, new OnRemoteConnectionEstablishedListener() {
-                        @Override
-                        public void onRemoteConnectionEstablishedListener(final BackendConnection connection, SQLException e) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    long remainingTime = 500 - (System.currentTimeMillis() - start);
-                                    if (remainingTime > 0)
-                                        try {
-                                            Thread.sleep(remainingTime);
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (connection != null) {
-                                                Log.i("SettingsActivity", "Connection to " + url + " established");
-                                                if (isAdded())
-                                                    preference.setSummary(url);
-                                            } else {
-                                                Log.i("SettingsActivity", "Connection to " + url + " failed");
-                                                if (isAdded())
-                                                    preference
-                                                            .setSummary(getString(R.string.setting_data_sync_backend_url_error)
-                                                                    + " " + url);
-                                            }
-                                        }
-                                    });
-                                }
-                            });
-                            if (connection != null) {
-                                if (isAdded())
-                                    preference.setSummary(url);
-                                getActivity().getSharedPreferences(Constants.files.settings, MODE_WORLD_WRITEABLE)
-                                        .edit()
-                                        .putString(Constants.preferences.url, url)
-                                        .apply();
-                            } else {
-                                if (isAdded())
-                                    preference
-                                            .setSummary(getString(R.string.setting_data_sync_backend_url_error)
-                                                    + " " + url);
-                            }
-                        }
-                    });
 
                     return true;
                 }
